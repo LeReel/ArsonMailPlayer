@@ -59,8 +59,8 @@ void SceneComponent::resized()
 
     currentPlaying.setBounds(0, _height - _height / 4, _width, _height / 4);
 
-    openButton.setBounds(0, _height - _height / 4, _width / 4, _height / 8);
-    fetchButton.setBounds(0, _height - _height / 8, _width / 4, _height / 8);
+    openButton.setBounds(0, _height - _height / 4, _width / 8, _height / 8);
+    fetchButton.setBounds(0, _height - _height / 8, _width / 8, _height / 8);
 
     auto area = getLocalBounds();
 

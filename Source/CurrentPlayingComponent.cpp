@@ -11,8 +11,8 @@ CurrentPlayingComponent::CurrentPlayingComponent()
     InitButton(playButton, "Play", [this] { playButtonClicked(); }, juce::Colours::darkolivegreen, false);
     InitButton(stopButton, "Stop", [this] { stopButtonClicked(); }, juce::Colours::indianred, false);
     InitButton(loopButton, "Loop", [this] { loopButtonClicked(); }, juce::Colours::yellow, true);
-    InitButton(prevButton, "<<", [this] { prevButtonClicked(); }, juce::Colours::yellow, true);
-    InitButton(nextButton, ">>", [this] { nextButtonClicked(); }, juce::Colours::yellow, true);
+    InitButton(prevButton, "<<", [this] { prevButtonClicked(); }, juce::Colours::darkorange, true);
+    InitButton(nextButton, ">>", [this] { nextButtonClicked(); }, juce::Colours::darkorange, true);
 
     addAndMakeVisible(&currentPlayingSlider);
     currentPlayingSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
@@ -111,12 +111,12 @@ void CurrentPlayingComponent::resized()
     playButton.setBounds(_transportButtonsX, 0, _widthBy8, _heightBy3);
     stopButton.setBounds(_transportButtonsX, _heightBy3, _widthBy8, _heightBy3);
 
-    prevButton.setBounds(_width / 3, _height/2, _width / 9, _height/4);
-    nextButton.setBounds(_width / 3 + _width / 3, _height/2, _width / 9, _height/4);
+    prevButton.setBounds(_width / 4, _height / 2, _width / 9, _height / 4);
+    nextButton.setBounds(_width - _width / 3, _height / 2, _width / 9, _height / 4);
 
     loopButton.setBounds(_transportButtonsX, _height - _heightBy3, _widthBy8, _heightBy3);
-    
-    currentPlayingSlider.setBounds(_width / 3, _height - _height / 3, _width / 3, _height/3);
+
+    currentPlayingSlider.setBounds(_width / 4, _height - _height / 3, _width / 2, _height / 3);
 }
 
 void CurrentPlayingComponent::SetSceneComponent(SceneComponent* _sceneComponent)
