@@ -7,8 +7,6 @@
       <GROUP id="{DB03E444-2621-C7EC-6544-83A36ACD30FC}" name="Python">
         <FILE id="JVEEkg" name="quickstart.py" compile="0" resource="1" file="Source/quickstart.py"/>
       </GROUP>
-      <FILE id="Vzvt75" name="credentials.json" compile="0" resource="1"
-            file="Source/credentials.json"/>
       <GROUP id="{F8450CC1-24B1-CC95-5131-545145C1F45B}" name="FSM">
         <GROUP id="{2FF7D2C7-7558-2809-B4D7-388845234F18}" name="Private"/>
         <GROUP id="{B89839A1-8B1F-C453-C114-D59E7D697B7E}" name="Public"/>
