@@ -44,12 +44,10 @@
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_USE_MP3AUDIOFORMAT="1"/>
   <EXPORTFORMATS>
-    <VS2022 targetFolder="Builds/VisualStudio2022" extraDefs="CURL_STATICLIB">
+    <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="MP3Player" headerPath="C:\Users\Robin\Documents\curl-7.87.0"
-                       libraryPath="C:\Users\Robin\Documents\curl-7.87.0" defines="CURL_STATICLIB"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="MP3Player" headerPath="C:\Users\Robin\Documents\curl-7.87.0"
-                       libraryPath="C:\Users\Robin\Documents\curl-7.87.0" defines="CURL_STATICLIB"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="MP3Player"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="MP3Player"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
