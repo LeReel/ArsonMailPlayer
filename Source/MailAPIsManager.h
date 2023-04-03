@@ -28,9 +28,10 @@ public:
     
     void RetrieveAttachments(const juce::String& _jsonString);
     
-    bool RefreshToken(int& statusCode);
+    bool RefreshOutlookToken(int& statusCode);
     
-    juce::String GetResultText(const juce::URL& _url);
+    juce::String GetResultText_Gmail(const juce::URL& _url);
+    juce::String GetResultText_Outlook(const juce::URL& _url);
 
     void Fetch();
     

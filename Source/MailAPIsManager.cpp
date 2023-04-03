@@ -10,9 +10,18 @@
 
 #include "MailAPIsManager.h"
 
-const juce::String MAILBOX_URL =
+
+const juce::String GMAIL_URL =
+    //"https://www.googleapis.com/gmail/v1/users/me";//"{$userId}/messages/{$id}?format=raw";
+    // "pop3://pop.gmail.com:995";
+    //"https://mail.google.com/mail/u/0/#inbox";
+    // "https://mail.google.com";
+    //"smtp://smtp.gmail.com:587";
+    "https://www.googleapis.com/auth/gmail.readonly";
+
+const juce::String OUTLOOK_MAILBOX_URL =
     "https://graph.microsoft.com/v1.0";
-juce::String ACCESS_TOKEN = "";
+juce::String OUTLOOK_ACCESS_TOKEN = "";
 
 struct MemoryStruct
 {
@@ -23,7 +32,9 @@ struct MemoryStruct
 MailAPIsManager::MailAPIsManager() : Thread("ArsonPlayer")
 {
     addAndMakeVisible(&userBox);
+    userBox.setText("ID");
     addAndMakeVisible(&passwordBox);
+    passwordBox.setText("Password");
 
     addAndMakeVisible(&confirmButton);
     confirmButton.setButtonText("Confirm");
@@ -32,9 +43,8 @@ MailAPIsManager::MailAPIsManager() : Thread("ArsonPlayer")
     confirmButton.setEnabled(true);
 
     addAndMakeVisible(&urlBox);
+    urlBox.setText("URL");
     addAndMakeVisible(&resultsBox);
-
-    //startThread();
 }
 
 MailAPIsManager::~MailAPIsManager()
@@ -44,9 +54,8 @@ MailAPIsManager::~MailAPIsManager()
 
 void MailAPIsManager::run()
 {
-    //TODO: Input as an influence
-    //const juce::String result = GetResultText(urlBox.getText());
-    const juce::String result = GetResultText(MAILBOX_URL + "/me/messages");
+    //const juce::String result = GetResultText_Outlook(OUTLOOK_MAILBOX_URL + "/me/messages");
+    const juce::String result = GetResultText_Gmail(GMAIL_URL);
 
     RetrieveAttachments(result);
 
@@ -54,6 +63,92 @@ void MailAPIsManager::run()
 
     if (mml.lockWasGained())
         resultsBox.loadContent(result);
+}
+
+juce::String MailAPIsManager::GetResultText_Gmail(const juce::URL& _url)
+{
+    juce::StringPairArray responseHeaders;
+    juce::String _contentTypeHeaders = "Content-Type: application/json";
+    //juce::String _userTypeHeaders = "user:" + userBox.getText();
+    //juce::String _passwordTypeHeaders = "password:" + passwordBox.getText();
+
+    int statusCode = 0;
+
+    if (auto stream = _url.createInputStream(juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
+                                             .withConnectionTimeoutMs(10000)
+                                             .withResponseHeaders(&responseHeaders)
+                                             .withStatusCode(&statusCode)
+                                             //.withExtraHeaders(_userTypeHeaders)
+                                             //.withExtraHeaders(_passwordTypeHeaders)
+                                             //.withExtraHeaders(_contentTypeHeaders)))
+                                             .withExtraHeaders("")))
+    {
+        return (statusCode != 0 ? "Status code: " + juce::String(statusCode) + juce::newLine : juce::String())
+            + "Response headers: " + juce::newLine
+            + responseHeaders.getDescription() + juce::newLine
+            + "----------------------------------------------------" + juce::newLine
+            + stream->readEntireStreamAsString();
+    }
+    else
+    {
+        if (statusCode != 0)
+            return "Arson Failed to connect, status code = " + juce::String(statusCode);
+
+        return "Arson Failed to connect!";
+    }
+}
+
+juce::String MailAPIsManager::GetResultText_Outlook(const juce::URL& _url)
+{
+    juce::StringPairArray responseHeaders;
+    juce::String _contentTypeHeaders = "Authorization: Bearer " + OUTLOOK_ACCESS_TOKEN +
+        ", Content-Type: application/json";
+
+    int statusCode = 0;
+
+    //	// Set the authorization header
+    //	struct curl_slist* headers = NULL;
+    //	headers = curl_slist_append(headers, "Authorization: Bearer [ACCESS_TOKEN]");
+
+    if (auto stream = _url.createInputStream(juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
+                                             .withConnectionTimeoutMs(10000)
+                                             .withResponseHeaders(&responseHeaders)
+                                             .withStatusCode(&statusCode)
+                                             .withExtraHeaders(_contentTypeHeaders)))
+    {
+        if (statusCode == 401) // Failed to authenticate
+        {
+            if (RefreshOutlookToken(statusCode))
+            {
+                if (auto _retryStream = _url.createInputStream(
+                    juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
+                    .withConnectionTimeoutMs(10000)
+                    .withResponseHeaders(&responseHeaders)
+                    .withStatusCode(&statusCode)
+                    .withExtraHeaders(_contentTypeHeaders)))
+                {
+                    return _retryStream->readEntireStreamAsString();
+                }
+                else
+                {
+                    return "Failed to refresh token, status code = " + juce::String(statusCode);
+                }
+            }
+        }
+
+        return (statusCode != 0 ? "Status code: " + juce::String(statusCode) + juce::newLine : juce::String())
+            + "Response headers: " + juce::newLine
+            + responseHeaders.getDescription() + juce::newLine
+            + "----------------------------------------------------" + juce::newLine
+            + stream->readEntireStreamAsString();
+    }
+    else
+    {
+        if (statusCode != 0)
+            return "Failed to connect, status code = " + juce::String(statusCode);
+
+        return "Failed to connect!";
+    }
 }
 
 void MailAPIsManager::OpenOutlook(char* _username, char* _password)
@@ -205,16 +300,16 @@ void MailAPIsManager::RetrieveAttachments(const juce::String& _jsonString)
             juce::String _id = _email.getProperty("id", juce::var()).toString();
 
             // Get the list of attachments for the email
-            juce::String attachmentsUrl = MAILBOX_URL + _id + "/attachments";
+            juce::String attachmentsUrl = OUTLOOK_MAILBOX_URL + _id + "/attachments";
         }
     }
 }
 
-bool MailAPIsManager::RefreshToken(int& statusCode)
+bool MailAPIsManager::RefreshOutlookToken(int& statusCode)
 {
     juce::StringPairArray responseHeaders;
 
-    juce::URL _refreshURL = MAILBOX_URL; // + "/login";
+    juce::URL _refreshURL = OUTLOOK_MAILBOX_URL; // + "/login";
 
     juce::DynamicObject* _obj = new juce::DynamicObject();
 
@@ -259,58 +354,6 @@ bool MailAPIsManager::RefreshToken(int& statusCode)
     return false;
 }
 
-juce::String MailAPIsManager::GetResultText(const juce::URL& _url)
-{
-    juce::StringPairArray responseHeaders;
-    juce::String _contentTypeHeaders = "Authorization: Bearer " + ACCESS_TOKEN + ", Content-Type: application/json";
-
-    int statusCode = 0;
-
-    //	// Set the authorization header
-    //	struct curl_slist* headers = NULL;
-    //	headers = curl_slist_append(headers, "Authorization: Bearer [ACCESS_TOKEN]");
-
-    if (auto stream = _url.createInputStream(juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
-                                             .withConnectionTimeoutMs(10000)
-                                             .withResponseHeaders(&responseHeaders)
-                                             .withStatusCode(&statusCode)
-                                             .withExtraHeaders(_contentTypeHeaders)))
-    {
-        if (statusCode == 401) // Failed to authenticate
-        {
-            if (RefreshToken(statusCode))
-            {
-                if (auto _retryStream = _url.createInputStream(
-                    juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
-                    .withConnectionTimeoutMs(10000)
-                    .withResponseHeaders(&responseHeaders)
-                    .withStatusCode(&statusCode)
-                    .withExtraHeaders(_contentTypeHeaders)))
-                {
-                    return _retryStream->readEntireStreamAsString();
-                }
-                else
-                {
-                    return "Failed to refresh token, status code = " + juce::String(statusCode);
-                }
-            }
-        }
-
-        return (statusCode != 0 ? "Status code: " + juce::String(statusCode) + juce::newLine : juce::String())
-            + "Response headers: " + juce::newLine
-            + responseHeaders.getDescription() + juce::newLine
-            + "----------------------------------------------------" + juce::newLine
-            + stream->readEntireStreamAsString();
-    }
-    else
-    {
-        if (statusCode != 0)
-            return "Failed to connect, status code = " + juce::String(statusCode);
-
-        return "Failed to connect!";
-    }
-}
-
 void MailAPIsManager::Fetch()
 {
     MailAPIsManager* _mailAPI = new MailAPIsManager();
@@ -339,7 +382,7 @@ size_t MailAPIsManager::WriteMemoryCallback(char* contents, size_t size, size_t 
 
 void MailAPIsManager::confirmButtonClicked()
 {
-    //TODO
+    startThread();
 }
 
 void MailAPIsManager::paint(juce::Graphics& graphics)
@@ -356,5 +399,5 @@ void MailAPIsManager::resized()
 
     urlBox.setBounds(0, _height / 3, _width, _height / 3);
 
-    resultsBox.setBounds(0, _height - _height / 3, _width, _height);
+    resultsBox.setBounds(0, _height - _height / 3, _width, _height / 3);
 }
