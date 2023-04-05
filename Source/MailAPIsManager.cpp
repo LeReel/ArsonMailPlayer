@@ -10,18 +10,13 @@
 
 #include "MailAPIsManager.h"
 
-
 const juce::String GMAIL_URL =
     //"https://www.googleapis.com/gmail/v1/users/me";//"{$userId}/messages/{$id}?format=raw";
-    // "pop3://pop.gmail.com:995";
-    //"https://mail.google.com/mail/u/0/#inbox";
-    // "https://mail.google.com";
-    //"smtp://smtp.gmail.com:587";
-    "https://www.googleapis.com/auth/gmail.readonly";
-
-const juce::String OUTLOOK_MAILBOX_URL =
-    "https://graph.microsoft.com/v1.0";
-juce::String OUTLOOK_ACCESS_TOKEN = "";
+    //"imap.gmail.com:993";
+    "https://www.googleapis.com/gmail/v1/users/me/messages";
+//"https://mail.google.com/mail/u/0/#inbox";
+// "https://mail.google.com";
+//"https://www.googleapis.com/auth/gmail.readonly";
 
 struct MemoryStruct
 {
@@ -54,10 +49,7 @@ MailAPIsManager::~MailAPIsManager()
 
 void MailAPIsManager::run()
 {
-    //const juce::String result = GetResultText_Outlook(OUTLOOK_MAILBOX_URL + "/me/messages");
-    const juce::String result = GetResultText_Gmail(GMAIL_URL);
-
-    RetrieveAttachments(result);
+    const juce::String result = Fetch_Gmail();
 
     juce::MessageManagerLock mml(this);
 
@@ -65,23 +57,62 @@ void MailAPIsManager::run()
         resultsBox.loadContent(result);
 }
 
-juce::String MailAPIsManager::GetResultText_Gmail(const juce::URL& _url)
+// The base URL for the Gmail API.
+const char* const kBaseUrl = "https://www.googleapis.com/gmail/v1/users/";
+
+// The scopes required by the Gmail API.
+const char* const kGmailScopes = "https://www.googleapis.com/auth/gmail.readonly";
+
+// The buffer size for reading response data.
+const int kBufferSize = 1024;
+
+// The callback function for writing response data to a string.
+static size_t WriteStringCallback(void* contents, size_t size, size_t nmemb, void* userp)
 {
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
+}
+
+juce::String MailAPIsManager::Fetch_Gmail()
+{
+    // The user's email ID and password.
+    const juce::String _email_id = userBox.getText();
+    const juce::String _email_password = passwordBox.getText();
+    
+    // // Set up an SSL context for secure connections.
+    // juce::SSLContext ssl_context;
+    // ssl_context.setSystemRootCertificates();
+    //
+    // // Set up an HTTP client to make requests to the Gmail API.
+    // juce::URL gmail_api_url(kBaseUrl + juce::String(kEmailId) + "/messages");
+    // juce::URL::OpenStreamProgressTask task(gmail_api_url, nullptr, &ssl_context);
+    //
+    // task.addHeader("Authorization", "Bearer " + juce::String(MakeGoogleCredential(kGmailScopes)->token()));
+    // task.addHeader("Content-Type", "application/json");
+    // task.addHeader("Accept", "application/json");
+    // juce::String response_data = task.run();
+    //
+    // // Parse the JSON response data.
+    // juce::var json_data = juce::JSON::parse(response_data);
+    // if (json_data.isVoid())
+    // {
+    //     return "Failed to parse JSON data";
+    // }
+    //
+    // return juce::JSON::toString(json_data, true);
+
     juce::StringPairArray responseHeaders;
     juce::String _contentTypeHeaders = "Content-Type: application/json";
-    //juce::String _userTypeHeaders = "user:" + userBox.getText();
-    //juce::String _passwordTypeHeaders = "password:" + passwordBox.getText();
 
     int statusCode = 0;
+
+    const juce::URL _url(GMAIL_URL);
 
     if (auto stream = _url.createInputStream(juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
                                              .withConnectionTimeoutMs(10000)
                                              .withResponseHeaders(&responseHeaders)
                                              .withStatusCode(&statusCode)
-                                             //.withExtraHeaders(_userTypeHeaders)
-                                             //.withExtraHeaders(_passwordTypeHeaders)
-                                             //.withExtraHeaders(_contentTypeHeaders)))
-                                             .withExtraHeaders("")))
+                                             .withExtraHeaders(_contentTypeHeaders)))
     {
         return (statusCode != 0 ? "Status code: " + juce::String(statusCode) + juce::newLine : juce::String())
             + "Response headers: " + juce::newLine
@@ -96,288 +127,6 @@ juce::String MailAPIsManager::GetResultText_Gmail(const juce::URL& _url)
 
         return "Arson Failed to connect!";
     }
-}
-
-juce::String MailAPIsManager::GetResultText_Outlook(const juce::URL& _url)
-{
-    juce::StringPairArray responseHeaders;
-    juce::String _contentTypeHeaders = "Authorization: Bearer " + OUTLOOK_ACCESS_TOKEN +
-        ", Content-Type: application/json";
-
-    int statusCode = 0;
-
-    //	// Set the authorization header
-    //	struct curl_slist* headers = NULL;
-    //	headers = curl_slist_append(headers, "Authorization: Bearer [ACCESS_TOKEN]");
-
-    if (auto stream = _url.createInputStream(juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
-                                             .withConnectionTimeoutMs(10000)
-                                             .withResponseHeaders(&responseHeaders)
-                                             .withStatusCode(&statusCode)
-                                             .withExtraHeaders(_contentTypeHeaders)))
-    {
-        if (statusCode == 401) // Failed to authenticate
-        {
-            if (RefreshOutlookToken(statusCode))
-            {
-                if (auto _retryStream = _url.createInputStream(
-                    juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
-                    .withConnectionTimeoutMs(10000)
-                    .withResponseHeaders(&responseHeaders)
-                    .withStatusCode(&statusCode)
-                    .withExtraHeaders(_contentTypeHeaders)))
-                {
-                    return _retryStream->readEntireStreamAsString();
-                }
-                else
-                {
-                    return "Failed to refresh token, status code = " + juce::String(statusCode);
-                }
-            }
-        }
-
-        return (statusCode != 0 ? "Status code: " + juce::String(statusCode) + juce::newLine : juce::String())
-            + "Response headers: " + juce::newLine
-            + responseHeaders.getDescription() + juce::newLine
-            + "----------------------------------------------------" + juce::newLine
-            + stream->readEntireStreamAsString();
-    }
-    else
-    {
-        if (statusCode != 0)
-            return "Failed to connect, status code = " + juce::String(statusCode);
-
-        return "Failed to connect!";
-    }
-}
-
-void MailAPIsManager::OpenOutlook(char* _username, char* _password)
-{
-    //CURL* curl;
-    //CURLcode res;
-    //
-    //curl = curl_easy_init();
-
-
-    // if (curl)
-    // {
-    // 	// Set the URL for the request
-    // 	curl_easy_setopt(curl, CURLOPT_URL, "https://graph.microsoft.com/v1.0/me/messages?$filter=hasAttachments eq true");
-    //
-    // 	// Set the authorization header
-    // 	struct curl_slist* headers = NULL;
-    // 	headers = curl_slist_append(headers, "Authorization: Bearer [ACCESS_TOKEN]");
-    // 	headers = curl_slist_append(headers, "Content-Type: application/json");
-    // 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    //
-    // 	// Set the function to handle the response data
-    // 	std::string responseData;
-    // 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteFunction);
-    // 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseData);
-    //
-    // 	// Perform the request
-    // 	res = curl_easy_perform(curl);
-    // 	if (res != CURLE_OK)
-    // 	{
-    // 		std::cerr << "cURL request failed: " << curl_easy_strerror(res) << std::endl;
-    // 	}
-    // 	else
-    // 	{
-    // 		// Parse the JSON response
-    // 		json responseJson = json::parse(responseData);
-    //
-    // 		// Get the list of emails
-    // 		std::vector<json> emails = responseJson["value"];
-    //
-    // 		// Iterate through the emails
-    // 		for (const json& email : emails)
-    // 		{
-    // 			// Get the ID of the email
-    // 			std::string emailId = email["id"];
-    //
-    // 			// Get the list of attachments for the email
-    // 			std::string attachmentsUrl = "https://graph.microsoft.com/v1.0/me/messages/" + emailId + "/attachments";
-    //
-    // 			curl_easy_setopt(curl, CURLOPT_URL, attachmentsUrl.c_str());
-    // 			std::string attachmentsResponseData;
-    // 			curl_easy_setopt(curl, CURLOPT_WRITEDATA, &attachmentsResponseData);
-    //
-    // 			res = curl_easy_perform(curl);
-    // 			if (res != CURLE_OK)
-    // 			{
-    // 				std::cerr << "cURL request failed: " << curl_easy_strerror(res) << std::endl;
-    // 			}
-    // 			else
-    // 			{
-    // 				json attachmentsResponseJson = json::parse(attachmentsResponseData);
-    // 				std::vector<json> attachments = attachmentsResponseJ;
-    // 			}
-    // 		}
-    // 	}
-    // }
-}
-
-void MailAPIsManager::OpenGmail(char* _username, char* _password)
-{
-    //CURL* curl;
-    //CURLcode res;
-
-    //curl = curl_easy_init();
-    //if (curl)
-    //{
-    //    username = _username;
-    //    password = _password;
-    //    struct MemoryStruct chunk;
-
-    //    chunk.memory = (char*)malloc(1);
-    //    chunk.size = 0;
-
-    //    //initialisation
-    //    curl_global_init(CURL_GLOBAL_ALL);
-    //    curl = curl_easy_init();
-
-
-    //    //login
-    //    curl_easy_setopt(curl, CURLOPT_USERNAME, _username);
-    //    curl_easy_setopt(curl, CURLOPT_PASSWORD, _password);
-
-    //    popsAccount = "pop3s://pop.gmail.com:995/"; //Adding '1' retrieves attachments
-
-    //    curl_easy_setopt(curl, CURLOPT_URL, popsAccount);
-    //    curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_ALL);
-    //    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
-    //    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
-
-    //    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, this->WriteMemoryCallback);
-    //    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-
-    //    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
-
-    //    //some servers needs this validation
-    //    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-
-    //    /* Perform the request, res will get the return code */
-    //    res = curl_easy_perform(curl);
-
-    //    /* Check for errors */
-    //    if (res != CURLE_OK)
-    //    {
-    //        fprintf(stderr, "curl_easy_perform() failed: %s\n",
-    //                curl_easy_strerror(res));
-    //    }
-    //    else
-    //    {
-    //        /*
-    //        here is where you can work with the data inside the chunk
-    //        */
-    //        printf("%s\n", chunk.memory); //here is the information
-    //        printf("%lu bytes retrieved\n", (long)chunk.size);
-    //    }
-
-    //    /* always cleanup */
-    //    curl_easy_cleanup(curl);
-
-    //    if (chunk.memory)
-    //        free(chunk.memory);
-    //    /* always cleanup */
-
-    //    curl_global_cleanup();
-    //}
-}
-
-void MailAPIsManager::RetrieveAttachments(const juce::String& _jsonString)
-{
-    // Parse the JSON response
-    juce::var _responseJson = juce::JSON::parse(_jsonString);
-
-    // Get the list of emails
-    if (juce::Array<juce::var>* _emails = _responseJson.getProperty("stringValue", juce::var()).getArray())
-    {
-        // Iterate through the emails
-        for (auto& _email : *_emails)
-        {
-            // Get the ID of the email
-            juce::String _id = _email.getProperty("id", juce::var()).toString();
-
-            // Get the list of attachments for the email
-            juce::String attachmentsUrl = OUTLOOK_MAILBOX_URL + _id + "/attachments";
-        }
-    }
-}
-
-bool MailAPIsManager::RefreshOutlookToken(int& statusCode)
-{
-    juce::StringPairArray responseHeaders;
-
-    juce::URL _refreshURL = OUTLOOK_MAILBOX_URL; // + "/login";
-
-    juce::DynamicObject* _obj = new juce::DynamicObject();
-
-    //TODO?: - Read strings from authBox
-    // _obj->setProperty("user", "{authBox.user_value}");
-    // _obj->setProperty("password", "{authBox.password_value}");
-
-    juce::var _json(_obj);
-    juce::String _jsonString = juce::JSON::toString(_json);
-
-    if (!_jsonString.isEmpty())
-    {
-        _refreshURL = _refreshURL.withPOSTData(_jsonString);
-    }
-
-    const juce::String _contentTypeHeaders =
-        "Content-Type: application/json";
-    const juce::String _idHeaders =
-        "username: {authBox.user_value}";
-    const juce::String _pwdHeaders =
-        "password: {authBox.password_value}";
-
-    if (auto _refreshTokenStream = _refreshURL
-        //.withPOSTData("/login HTTP/1.1")
-        //.withParameter("user", "{authBox.user_value}") ???
-        //.withParameter("password", {authBox.password_value}) ???
-        .createInputStream(
-            juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
-            //.withHttpRequestCmd("POST")
-            .withConnectionTimeoutMs(10000)
-            .withResponseHeaders(&responseHeaders)
-            .withStatusCode(&statusCode)
-            //.withExtraHeaders("/login")
-            .withExtraHeaders(_contentTypeHeaders)
-            //.withExtraHeaders(_idHeaders) ???
-            //.withExtraHeaders(_pwdHeaders) ???
-        ))
-    {
-        //TODO: Set new token value
-        return true;
-    }
-    return false;
-}
-
-void MailAPIsManager::Fetch()
-{
-    MailAPIsManager* _mailAPI = new MailAPIsManager();
-    _mailAPI->OpenGmail("test", "test");
-}
-
-size_t MailAPIsManager::WriteMemoryCallback(char* contents, size_t size, size_t nmemb, void* userp)
-{
-    size_t realsize = size * nmemb;
-    struct MemoryStruct* mem = (struct MemoryStruct*)userp;
-
-    mem->memory = (char*)realloc(mem->memory, mem->size + realsize + 1);
-    if (mem->memory == NULL)
-    {
-        /* out of memory! */
-        printf("not enough memory (realloc returned NULL)\n");
-        return 0;
-    }
-
-    memcpy(&(mem->memory[mem->size]), contents, realsize);
-    mem->size += realsize;
-    mem->memory[mem->size] = 0;
-
-    return realsize;
 }
 
 void MailAPIsManager::confirmButtonClicked()

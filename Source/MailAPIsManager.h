@@ -22,21 +22,9 @@ public:
     ~MailAPIsManager();
 
     void run() override;
-    
-    void OpenOutlook(char* _username, char* _password);
-    void OpenGmail(char* _username, char* _password);
-    
-    void RetrieveAttachments(const juce::String& _jsonString);
-    
-    bool RefreshOutlookToken(int& statusCode);
-    
-    juce::String GetResultText_Gmail(const juce::URL& _url);
-    juce::String GetResultText_Outlook(const juce::URL& _url);
 
-    void Fetch();
+    juce::String Fetch_Gmail();
     
-    static size_t WriteMemoryCallback(char *contents, size_t size, size_t nmemb, void *userp);
-
     void confirmButtonClicked();
 
     void paint(juce::Graphics&) override;
