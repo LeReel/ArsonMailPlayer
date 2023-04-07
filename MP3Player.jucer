@@ -4,9 +4,6 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="PcaS9D" name="MP3Player">
     <GROUP id="{892787E5-A055-114C-2EE7-01913E06FC6E}" name="Source">
-      <GROUP id="{DB03E444-2621-C7EC-6544-83A36ACD30FC}" name="Python">
-        <FILE id="JVEEkg" name="quickstart.py" compile="0" resource="1" file="Source/quickstart.py"/>
-      </GROUP>
       <GROUP id="{F8450CC1-24B1-CC95-5131-545145C1F45B}" name="FSM">
         <GROUP id="{2FF7D2C7-7558-2809-B4D7-388845234F18}" name="Private"/>
         <GROUP id="{B89839A1-8B1F-C453-C114-D59E7D697B7E}" name="Public"/>
@@ -14,8 +11,6 @@
       <GROUP id="{5DF8CEC9-0AF6-07BF-8CEF-247FE9B68CF7}" name="Public">
         <FILE id="W1XdPn" name="MP3Application.h" compile="0" resource="0"
               file="Source/MP3Application.h"/>
-        <FILE id="dokdsk" name="MailAPIsManager.h" compile="0" resource="0"
-              file="Source/MailAPIsManager.h"/>
         <FILE id="yOhfhu" name="SceneComponent.h" compile="0" resource="0"
               file="Source/SceneComponent.h"/>
         <FILE id="E8laoE" name="CurrentPlayingComponent.h" compile="0" resource="0"
@@ -27,8 +22,6 @@
       </GROUP>
       <GROUP id="{0BC6D3CB-8B50-CADD-9DC1-D2FC6681CFA3}" name="Private">
         <FILE id="Ge5zxp" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
-        <FILE id="PqGBFw" name="MailAPIsManager.cpp" compile="1" resource="0"
-              file="Source/MailAPIsManager.cpp"/>
         <FILE id="nydvA4" name="SceneComponent.cpp" compile="1" resource="0"
               file="Source/SceneComponent.cpp"/>
         <FILE id="obdEDr" name="CurrentPlayingComponent.cpp" compile="1" resource="0"

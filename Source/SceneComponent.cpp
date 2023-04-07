@@ -18,10 +18,6 @@ SceneComponent::SceneComponent()
     openButton.onClick = [this] { openButtonClicked(); };
     openButton.setColour(juce::TextButton::buttonColourId, juce::Colours::darkslategrey);
     openButton.setEnabled(true);
-
-    addAndMakeVisible(fetchButton);
-    fetchButton.onClick = [this] { fetchButtonClicked(); };
-
 }
 
 SceneComponent::~SceneComponent()
@@ -47,12 +43,6 @@ void SceneComponent::resized()
     currentPlaying.setBounds(0, _height - _height / 4, _width, _height / 4);
 
     openButton.setBounds(0, _height - _height / 4, _width / 8, _height / 8);
-    fetchButton.setBounds(0, _height - _height / 8, _width / 8, _height / 8);
-
-    if(isAPIManagerEnabled)
-    {
-        APIManager.setBounds(0, _height/3, _width, _height/3);
-    }
 }
 
 void SceneComponent::onSongChoosed(SongTableElement& _song)
@@ -77,11 +67,4 @@ void SceneComponent::openButtonClicked()
         // Adds selected files to songsList
         songsList.InitTableList(_files);
     });
-}
-
-void SceneComponent::fetchButtonClicked()
-{
-    if(isAPIManagerEnabled)return;
-    addAndMakeVisible(&APIManager, -3);
-    isAPIManagerEnabled = true;
 }

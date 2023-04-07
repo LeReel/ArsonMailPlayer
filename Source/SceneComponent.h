@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MailAPIsManager.h"
+#include "CurrentPlayingComponent.h"
 
 class SceneComponent : public juce::Component
     // Class can inherit typeWanted Listener
@@ -23,12 +23,9 @@ public:
     void onSongChoosed(SongTableElement& _song);
 
     void openButtonClicked();
-    void fetchButtonClicked();
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SceneComponent)
-
-    juce::TextButton fetchButton{"Download URL Contents"};
 
     TableSongListComponent songsList;
 
@@ -36,8 +33,5 @@ private:
 
     juce::TextButton openButton;
     std::unique_ptr<juce::FileChooser> chooser;
-    
-    MailAPIsManager APIManager;
-    bool isAPIManagerEnabled = false;
 };
 
