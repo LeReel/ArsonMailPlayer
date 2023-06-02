@@ -6,8 +6,8 @@ SceneComponent::SceneComponent()
 
     songsList.SetOwner(this);
     addAndMakeVisible(&songsList);
-    addAndMakeVisible(&currentPlaying);
     currentPlaying.SetOwner(this);
+    addAndMakeVisible(&currentPlaying);
 
     Utils::InitButton(this, openButton, "Open", [this] { openButtonClicked(); }, juce::Colours::darkslategrey, true);
 }
