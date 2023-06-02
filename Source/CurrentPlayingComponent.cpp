@@ -104,19 +104,23 @@ void CurrentPlayingComponent::resized()
     const int _width = getWidth(), _height = getHeight();
     setSize(_width, _height);
 
-    const int _widthBy8 = _width / 8;
-    const int _heightBy3 = _height / 3;
+    const int _widthBy4 = _width / 4,
+              _widthBy8 = _width / 8,
+              _widthBy9 = _width / 9,
+              _heightBy2 = _height / 2,
+              _heightBy3 = _height / 3,
+              _heightBy4 = _height / 4;
     const int _transportButtonsX = _width - _widthBy8;
 
     playButton.setBounds(_transportButtonsX, 0, _widthBy8, _heightBy3);
     stopButton.setBounds(_transportButtonsX, _heightBy3, _widthBy8, _heightBy3);
 
-    prevButton.setBounds(_width / 4, _height / 2, _width / 9, _height / 4);
-    nextButton.setBounds(_width - _width / 3, _height / 2, _width / 9, _height / 4);
+    prevButton.setBounds(_widthBy4, _heightBy2, _widthBy9, _heightBy4);
+    nextButton.setBounds(_width - _width / 3, _heightBy2, _widthBy9, _heightBy4);
 
     loopButton.setBounds(_transportButtonsX, _height - _heightBy3, _widthBy8, _heightBy3);
 
-    currentPlayingSlider.setBounds(_width / 4, _height - _height / 3, _width / 2, _height / 3);
+    currentPlayingSlider.setBounds(_widthBy4, _height - _heightBy3, _width / 2, _heightBy3);
 }
 
 void CurrentPlayingComponent::OnSongChoose(SongTableElement& _song)

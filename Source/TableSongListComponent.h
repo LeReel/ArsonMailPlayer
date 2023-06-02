@@ -99,22 +99,19 @@ public:
 #pragma endregion Methods
 
 #pragma region Fields
-
 private:
     juce::TableListBox table{{}, this};
     juce::Font font{14.0f};
-
-    juce::FileChooser fileChooser{
-        "Browse for TableData.xml",
-        juce::File::getSpecialLocation(juce::File::invokedExecutableFile)
-    };
+    
+    juce::Colour rowColour;
+    juce::Colour rowColour_interpolated;
 
     juce::Array<juce::String> columnsList;
     juce::Array<SongTableElement*> datasList;
     int datasAmount = 0, currentSelectionRow = 0, currentSelectionColumn = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TableSongListComponent)
-#pragma region Fields
+#pragma endregion Fields
 };
 
 class DataSorter
@@ -130,5 +127,5 @@ public:
 
 private:
     juce::String attributeToSort;
-    int direction;
+    int direction = 0;
 };

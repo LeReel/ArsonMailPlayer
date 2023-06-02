@@ -25,11 +25,4 @@ private:
     SceneComponent sceneComponent;
 
     int sizeX = 0, sizeY = 0;
-    juce::String currentSizeAsString;
 };
-
-static void DrawGrid(juce::Graphics& g,
-                     unsigned int _width,
-                     unsigned int _height,
-                     unsigned int _spacingX = 50,
-                     unsigned int _spacingY = 50);

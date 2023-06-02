@@ -30,11 +30,15 @@ void SceneComponent::resized()
 {
     const int _width = getWidth(), _height = getHeight();
 
-    songsList.setBounds(0, 0, _width, _height - _height / 3);
+    const int _heightBy4 = _height / 4;
 
-    currentPlaying.setBounds(0, _height - _height / 4, _width, _height / 4);
+    const int _heightMinusBy4 = _height - _heightBy4;
 
-    openButton.setBounds(0, _height - _height / 4, _width / 8, _height / 8);
+    songsList.setBounds(0, 0, _width, _heightMinusBy4);
+
+    currentPlaying.setBounds(0, _heightMinusBy4, _width, _heightBy4);
+
+    openButton.setBounds(0, _heightMinusBy4, _width / 8, _height / 8);
 }
 
 void SceneComponent::onSongChose(SongTableElement& _song)

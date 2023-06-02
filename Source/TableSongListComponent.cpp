@@ -5,6 +5,10 @@
 TableSongListComponent::TableSongListComponent()
 {
     columnsList = ATTRIBUTES_LIST;
+
+    rowColour = getLookAndFeel().findColour(juce::ListBox::backgroundColourId);
+    rowColour_interpolated = rowColour.interpolatedWith(getLookAndFeel().findColour(juce::ListBox::textColourId),
+                                                        0.03f);
 }
 
 TableSongListComponent::~TableSongListComponent()
@@ -24,13 +28,10 @@ void TableSongListComponent::cellDoubleClicked(int rowNumber, int columnId, cons
 void TableSongListComponent::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height,
                                                 bool rowIsSelected)
 {
-    auto alternateColour = getLookAndFeel().findColour(juce::ListBox::backgroundColourId)
-                                           .interpolatedWith(getLookAndFeel().findColour(juce::ListBox::textColourId),
-                                                             0.03f);
     if (rowIsSelected)
         g.fillAll(juce::Colours::rebeccapurple);
     else if (rowNumber % 2)
-        g.fillAll(alternateColour);
+        g.fillAll(rowColour_interpolated);
 }
 
 void TableSongListComponent::paintCell(juce::Graphics& g, int rowNumber, int columnId, int width, int height,
@@ -38,7 +39,7 @@ void TableSongListComponent::paintCell(juce::Graphics& g, int rowNumber, int col
 {
     g.setColour(rowIsSelected || rowNumber == currentSelectionRow
                     ? juce::Colours::darkorange
-                    : getLookAndFeel().findColour(juce::ListBox::textColourId));
+                    : juce::Colours::whitesmoke);
     g.setFont(font);
 
     SongTableElement& _element = *datasList[rowNumber];
@@ -68,8 +69,9 @@ juce::Component* TableSongListComponent::refreshComponentForCell(int rowNumber, 
 int TableSongListComponent::getColumnAutoSizeWidth(int columnId)
 {
     int widest = 32;
+    const int _numRows = getNumRows();
 
-    for (auto i = getNumRows(); --i >= 0;)
+    for (int i = _numRows; --i >= 0;)
     {
         SongTableElement& _element = *datasList[i];
 
@@ -140,16 +142,16 @@ void TableSongListComponent::LoadDatas(juce::Array<juce::File> _files)
 
         bool _alreadyInList = false;
 
-        for(SongTableElement* _data : datasList)
+        for (SongTableElement* _data : datasList)
         {
-            if(_data->GetStringAttribute("Title") == _title)
+            if (_data->GetStringAttribute("Title") == _title)
             {
                 _alreadyInList = true;
                 break;
             }
         }
 
-        if(!_alreadyInList) datasList.add(_element);
+        if (!_alreadyInList) datasList.add(_element);
     }
 
     datasAmount = datasList.size();

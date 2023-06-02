@@ -11,5 +11,11 @@ namespace Utils
                     juce::Colour _colour,
                     bool _isEnabled);
 
+    void DrawGrid(juce::Graphics& g,
+                         unsigned int _width,
+                         unsigned int _height,
+                         unsigned int _spacingX = 50,
+                         unsigned int _spacingY = 50);
+    
     void SetComponentOwner(IMyComponent* _owned, IMyComponent* _owner);
 }
