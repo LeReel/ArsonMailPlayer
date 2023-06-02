@@ -4,32 +4,33 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="PcaS9D" name="MP3Player">
     <GROUP id="{892787E5-A055-114C-2EE7-01913E06FC6E}" name="Source">
-      <GROUP id="{F8450CC1-24B1-CC95-5131-545145C1F45B}" name="FSM">
-        <GROUP id="{2FF7D2C7-7558-2809-B4D7-388845234F18}" name="Private"/>
-        <GROUP id="{B89839A1-8B1F-C453-C114-D59E7D697B7E}" name="Public"/>
-      </GROUP>
       <GROUP id="{5DF8CEC9-0AF6-07BF-8CEF-247FE9B68CF7}" name="Public">
-        <FILE id="W1XdPn" name="MP3Application.h" compile="0" resource="0"
-              file="Source/MP3Application.h"/>
-        <FILE id="yOhfhu" name="SceneComponent.h" compile="0" resource="0"
-              file="Source/SceneComponent.h"/>
-        <FILE id="E8laoE" name="CurrentPlayingComponent.h" compile="0" resource="0"
-              file="Source/CurrentPlayingComponent.h"/>
-        <FILE id="o0bWUf" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+        <FILE id="I0tfkS" name="IMyComponent.h" compile="0" resource="0" file="Source/IMyComponent.h"/>
+        <FILE id="ssJaO4" name="Utils.h" compile="0" resource="0" file="Source/Utils.h"/>
         <FILE id="WfAw4a" name="TableSongListComponent.h" compile="0" resource="0"
               file="Source/TableSongListComponent.h"/>
+        <FILE id="E8laoE" name="CurrentPlayingComponent.h" compile="0" resource="0"
+              file="Source/CurrentPlayingComponent.h"/>
+        <FILE id="yOhfhu" name="SceneComponent.h" compile="0" resource="0"
+              file="Source/SceneComponent.h"/>
+        <FILE id="o0bWUf" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
         <FILE id="lsfJUg" name="MainWindow.h" compile="0" resource="0" file="Source/MainWindow.h"/>
+        <FILE id="W1XdPn" name="MP3Application.h" compile="0" resource="0"
+              file="Source/MP3Application.h"/>
       </GROUP>
       <GROUP id="{0BC6D3CB-8B50-CADD-9DC1-D2FC6681CFA3}" name="Private">
-        <FILE id="Ge5zxp" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
-        <FILE id="nydvA4" name="SceneComponent.cpp" compile="1" resource="0"
-              file="Source/SceneComponent.cpp"/>
-        <FILE id="obdEDr" name="CurrentPlayingComponent.cpp" compile="1" resource="0"
-              file="Source/CurrentPlayingComponent.cpp"/>
+        <FILE id="crBxOq" name="IMyComponent.cpp" compile="1" resource="0"
+              file="Source/IMyComponent.cpp"/>
+        <FILE id="mDTfSt" name="Utils.cpp" compile="1" resource="0" file="Source/Utils.cpp"/>
         <FILE id="F3HuFe" name="TableSongListComponent.cpp" compile="1" resource="0"
               file="Source/TableSongListComponent.cpp"/>
+        <FILE id="obdEDr" name="CurrentPlayingComponent.cpp" compile="1" resource="0"
+              file="Source/CurrentPlayingComponent.cpp"/>
+        <FILE id="nydvA4" name="SceneComponent.cpp" compile="1" resource="0"
+              file="Source/SceneComponent.cpp"/>
         <FILE id="iNeuT0" name="MainComponent.cpp" compile="1" resource="0"
               file="Source/MainComponent.cpp"/>
+        <FILE id="Ge5zxp" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
         <FILE id="HW3cmK" name="MP3Application.cpp" compile="1" resource="0"
               file="Source/MP3Application.cpp"/>
       </GROUP>

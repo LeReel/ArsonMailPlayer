@@ -4,24 +4,17 @@ SceneComponent::SceneComponent()
 {
     setSize(getWidth(), getHeight());
 
-    //TODO: launch quickstart.py to log into mailbox that holds .mp3 attachments
-    //TODO: launch attachments retrieving to populate songList
-
-    //songsList.onChange = [this] { onSongChoosed(); };
-    songsList.SetSceneOwner(this);
+    songsList.SetOwner(this);
     addAndMakeVisible(&songsList);
     addAndMakeVisible(&currentPlaying);
-    currentPlaying.SetSceneComponent(this);
+    currentPlaying.SetOwner(this);
 
-    addAndMakeVisible(&openButton);
-    openButton.setButtonText("Open");
-    openButton.onClick = [this] { openButtonClicked(); };
-    openButton.setColour(juce::TextButton::buttonColourId, juce::Colours::darkslategrey);
-    openButton.setEnabled(true);
+    Utils::InitButton(this, openButton, "Open", [this] { openButtonClicked(); }, juce::Colours::darkslategrey, true);
 }
 
 SceneComponent::~SceneComponent()
 {
+    juce::Component::~Component();
     // Uncomment if inheriting Listener
     // songsList.removeListener(this);
 }
@@ -36,23 +29,23 @@ void SceneComponent::paint(juce::Graphics& g)
 
 void SceneComponent::resized()
 {
-    int _width = getWidth(), _height = getHeight();
+    const int _width = getWidth(), _height = getHeight();
 
-    songsList.setBounds(0, 0, _width, _height / 3);
+    songsList.setBounds(0, 0, _width, _height - _height / 3);
 
     currentPlaying.setBounds(0, _height - _height / 4, _width, _height / 4);
 
     openButton.setBounds(0, _height - _height / 4, _width / 8, _height / 8);
 }
 
-void SceneComponent::onSongChoosed(SongTableElement& _song)
+void SceneComponent::onSongChose(SongTableElement& _song)
 {
     currentPlaying.OnSongChoose(_song);
 }
 
 void SceneComponent::openButtonClicked()
 {
-    juce::Array<juce::String> _s = {"*.wav ", " *.mp3"};
+    juce::Array<juce::String> _s = {"*.wav ", "*.mp3"};
     chooser = std::make_unique<juce::FileChooser>("Select a Wave file to play...",
                                                   juce::File{},
                                                   "*.mp3");

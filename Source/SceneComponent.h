@@ -2,9 +2,9 @@
 
 #include "CurrentPlayingComponent.h"
 
-class SceneComponent : public juce::Component
-    // Class can inherit typeWanted Listener
-    // public juce::ComboBox::Listener
+class SceneComponent : public juce::Component,
+                       public IMyComponent
+    //? Class can inherit typeWanted Listener
 {
 public:
     SceneComponent();
@@ -19,8 +19,7 @@ public:
     }
 
     /// Event function
-    /// Override event function if inheriting Listener
-    void onSongChoosed(SongTableElement& _song);
+    void onSongChose(SongTableElement& _song);
 
     void openButtonClicked();
 
@@ -34,4 +33,3 @@ private:
     juce::TextButton openButton;
     std::unique_ptr<juce::FileChooser> chooser;
 };
-

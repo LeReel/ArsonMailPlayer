@@ -8,15 +8,15 @@ CurrentPlayingComponent::CurrentPlayingComponent()
 
     currentPlayingString = "No selected song";
 
-    InitButton(playButton, "Play", [this] { playButtonClicked(); }, juce::Colours::darkolivegreen, false);
-    InitButton(stopButton, "Stop", [this] { stopButtonClicked(); }, juce::Colours::indianred, false);
-    InitButton(loopButton, "Loop", [this] { loopButtonClicked(); }, juce::Colours::yellow, true);
-    InitButton(prevButton, "<<", [this] { prevButtonClicked(); }, juce::Colours::darkorange, true);
-    InitButton(nextButton, ">>", [this] { nextButtonClicked(); }, juce::Colours::darkorange, true);
-
     addAndMakeVisible(&currentPlayingSlider);
     currentPlayingSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     currentPlayingSlider.SetCurrentPlayingComponent(this);
+
+    Utils::InitButton(this, playButton, "Play", [this] { playButtonClicked(); }, juce::Colours::darkolivegreen, false);
+    Utils::InitButton(this, stopButton, "Stop", [this] { stopButtonClicked(); }, juce::Colours::indianred, false);
+    Utils::InitButton(this, loopButton, "Loop", [this] { loopButtonClicked(); }, juce::Colours::yellow, true);
+    Utils::InitButton(this, prevButton, "<<", [this] { prevButtonClicked(); }, juce::Colours::darkorange, true);
+    Utils::InitButton(this, nextButton, ">>", [this] { nextButtonClicked(); }, juce::Colours::darkorange, true);
 
     // Registers a list of standards formats. Creates readers for wav/aiff/mp3
     formatManager.registerBasicFormats();
@@ -119,11 +119,6 @@ void CurrentPlayingComponent::resized()
     currentPlayingSlider.setBounds(_width / 4, _height - _height / 3, _width / 2, _height / 3);
 }
 
-void CurrentPlayingComponent::SetSceneComponent(SceneComponent* _sceneComponent)
-{
-    sceneComponent = _sceneComponent;
-}
-
 void CurrentPlayingComponent::OnSongChoose(SongTableElement& _song)
 {
     if (transportSource.isPlaying())
@@ -155,7 +150,6 @@ void CurrentPlayingComponent::ChangeState(TransportState _state)
 {
     if (_state == currentState) return;
 
-    //TODO: replace with FSM to switch between states
     currentState = _state;
 
     switch (currentState)
@@ -204,19 +198,6 @@ void CurrentPlayingComponent::UpdateCurrentPlayingPosition(double _newPosition)
     transportSource.setPosition(_newPosition);
 }
 
-void CurrentPlayingComponent::InitButton(juce::Button& _button,
-                                         juce::String _text,
-                                         std::function<void()> _callback,
-                                         juce::Colour _colour,
-                                         bool _isEnabled)
-{
-    addAndMakeVisible(&_button);
-    _button.setButtonText(_text);
-    _button.onClick = _callback;
-    _button.setColour(juce::TextButton::buttonColourId, _colour);
-    _button.setEnabled(_isEnabled);
-}
-
 void CurrentPlayingComponent::playButtonClicked()
 {
     if ((currentState == Stopped) || (currentState == Paused))
@@ -235,12 +216,18 @@ void CurrentPlayingComponent::stopButtonClicked()
 
 void CurrentPlayingComponent::prevButtonClicked()
 {
-    sceneComponent->GetSongList()->ChangeCell(-1);
+    if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
+    {
+        _sC->GetSongList()->ChangeCell(-1);
+    }
 }
 
 void CurrentPlayingComponent::nextButtonClicked()
 {
-    sceneComponent->GetSongList()->ChangeCell(1);
+    if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
+    {
+        _sC->GetSongList()->ChangeCell(1);
+    }
 }
 
 void CurrentPlayingComponent::loopButtonClicked() const

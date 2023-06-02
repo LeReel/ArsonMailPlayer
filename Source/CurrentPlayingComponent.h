@@ -15,6 +15,7 @@ enum TransportState
 };
 
 class CurrentPlayingComponent : public juce::AudioAppComponent,
+                                public IMyComponent,
                                 public juce::ChangeListener,
                                 public juce::Timer
 {
@@ -39,14 +40,10 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
 
-    void SetSceneComponent(SceneComponent* _sceneComponent);
-
     void OnSongChoose(SongTableElement& _file);
     void ChangeState(TransportState _state);
     void UpdateLoopState(bool _shouldLoop) const;
     void UpdateCurrentPlayingPosition(double _newPosition);
-    void InitButton(juce::Button& _button, juce::String _text, std::function<void()> _callback,
-                    juce::Colour _colour, bool _isEnabled);
 
     void playButtonClicked();
     void stopButtonClicked();
@@ -86,6 +83,7 @@ private:
         {
             currentPlayingComponent = _currentPlayingComponent;
         }
+
         CurrentPlayingComponent& GetCurrentPlayingComponent()
         {
             return *currentPlayingComponent;
@@ -93,13 +91,12 @@ private:
 
         void valueChanged() override
         {
-            if(!currentPlayingComponent)return;
+            if (!currentPlayingComponent)return;
             currentPlayingComponent->UpdateCurrentPlayingPosition(getValue());
         }
     };
 
     CurrentPlayingSlider currentPlayingSlider;
-    SceneComponent* sceneComponent = nullptr;
 
     /**
      * \brief Stored in a unique_ptr because we need to create these objects dynamically based on the user's actions.
