@@ -15,7 +15,10 @@ void TableSongListComponent::cellDoubleClicked(int rowNumber, int columnId, cons
 {
     SetCurrentSelected(rowNumber);
 
-    sceneOwner->onSongChoosed(GetCurrentSelected());
+    if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
+    {
+        _sC->onSongChose(GetCurrentSelected());
+    }
 }
 
 void TableSongListComponent::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height,
@@ -118,32 +121,35 @@ void TableSongListComponent::InitTableList(juce::Array<juce::File> _files)
 void TableSongListComponent::SetCurrentSelected(const int rowNumber)
 {
     const int _childrenCount = datasList.size();
-    for (int i = 0; i < _childrenCount; i ++)
+    for (int i = 0; i < _childrenCount; i++)
     {
         const bool _isSelected = rowNumber == -1 ? false : i == rowNumber;
         if (_isSelected) currentSelectionRow = i;
     }
 }
 
-void TableSongListComponent::SetSceneOwner(SceneComponent* _owner)
-{
-    sceneOwner = _owner;
-}
-
-SceneComponent* TableSongListComponent::GetSceneOwner()
-{
-    return sceneOwner;
-}
-
 void TableSongListComponent::LoadDatas(juce::Array<juce::File> _files)
 {
     for (juce::File _file : _files)
     {
-        if (_file == juce::File() || ! _file.exists())
+        if (_file == juce::File() || !_file.exists())
             return;
 
         auto* _element = new SongTableElement(_file);
-        datasList.add(_element);
+        const juce::String _title = _element->GetStringAttribute("Title");
+
+        bool _alreadyInList = false;
+
+        for(SongTableElement* _data : datasList)
+        {
+            if(_data->GetStringAttribute("Title") == _title)
+            {
+                _alreadyInList = true;
+                break;
+            }
+        }
+
+        if(!_alreadyInList) datasList.add(_element);
     }
 
     datasAmount = datasList.size();
@@ -158,7 +164,10 @@ void TableSongListComponent::ChangeCell(int _move)
     currentSelectionRow += _move;
     SetCurrentSelected(currentSelectionRow);
 
-    sceneOwner->onSongChoosed(GetCurrentSelected());
+    if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
+    {
+        _sC->onSongChose(GetCurrentSelected());
+    }
 }
 
 juce::String TableSongListComponent::GetColumnNameAttribute(int _columnId) const

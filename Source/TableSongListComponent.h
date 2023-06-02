@@ -1,6 +1,6 @@
 #pragma once
 
-#include <JuceHeader.h>
+#include "Utils.h"
 
 class SceneComponent;
 
@@ -38,6 +38,7 @@ public:
 };
 
 class TableSongListComponent : public juce::Component,
+                               public IMyComponent,
                                public juce::TableListBoxModel
 {
 public:
@@ -78,13 +79,12 @@ public:
     void resized() override
     {
         table.setBoundsInset(juce::BorderSize<int>(8));
+        table.autoSizeAllColumns();
     }
 #pragma endregion Overrides
 #pragma region Customs
-    void SetSceneOwner(SceneComponent* _owner);
     void SetCurrentSelected(const int rowNumber);
 
-    SceneComponent* GetSceneOwner();
     SongTableElement& GetCurrentSelected() const;
 
     void InitTableList(juce::Array<juce::File> _files);
@@ -101,8 +101,6 @@ public:
 #pragma region Fields
 
 private:
-    SceneComponent* sceneOwner = nullptr;
-
     juce::TableListBox table{{}, this};
     juce::Font font{14.0f};
 
