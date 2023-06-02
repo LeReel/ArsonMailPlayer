@@ -14,7 +14,6 @@ SceneComponent::SceneComponent()
 
 SceneComponent::~SceneComponent()
 {
-    juce::Component::~Component();
     // Uncomment if inheriting Listener
     // songsList.removeListener(this);
 }
