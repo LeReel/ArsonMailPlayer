@@ -40,7 +40,7 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
 
-    void OnSongChoose(SongTableElement& _file);
+    void OnSongChose(SongTableElement& _file);
     void ChangeState(TransportState _state);
     void UpdateLoopState(bool _shouldLoop) const;
     void UpdateCurrentPlayingPosition(double _newPosition);

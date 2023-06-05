@@ -4,11 +4,13 @@
 
 class SceneComponent;
 
-const juce::Array<juce::String> ATTRIBUTES_LIST{"Title", "Artist", "Album"};
+const juce::Array<juce::String> ATTRIBUTES_LIST{"Title", "Artist", "Album", "Favorite"};
 
 class SongTableElement
 {
     juce::File associatedFile;
+
+    bool isFavorite = false;
 
     std::map<juce::String, juce::String> attributes;
 
@@ -19,6 +21,12 @@ public:
 
         for (juce::String _attribute : ATTRIBUTES_LIST)
         {
+            if (_attribute == "Favorite")
+            {
+                attributes.insert(std::pair<juce::String, juce::String>(_attribute, " "));
+                continue;
+            }
+
             attributes.insert(std::pair<juce::String, juce::String>(_attribute, "Unknown"));
         }
         attributes["Title"] = associatedFile.getFileName();
@@ -26,9 +34,25 @@ public:
 
     juce::File& GetAssociatedFile() { return associatedFile; }
 
+    bool GetIsFavorite()
+    {
+        return isFavorite;
+    }
+
     juce::String GetStringAttribute(juce::String _attribute)
     {
         return attributes[_attribute];
+    }
+
+    void SwitchIsFavorite()
+    {
+        SetIsFavorite(!isFavorite);
+    }
+
+    void SetIsFavorite(const bool _isFavorite)
+    {
+        isFavorite = _isFavorite;
+        SetStringAttibute("Favorite", isFavorite ? "X" : "");
     }
 
     void SetStringAttibute(juce::String _attribute, juce::String _value)
@@ -47,6 +71,7 @@ public:
 
 #pragma region Methods
 #pragma region Overrides
+    void cellClicked(int rowNumber, int columnId, const juce::MouseEvent&) override;
     void cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent&) override;
 
     int getNumRows() override
@@ -95,14 +120,33 @@ public:
      * \return Element.Name as String
      */
     juce::String GetColumnNameAttribute(int _columnId) const;
+
+    void AddSongToList(SongTableElement* _toAdd)
+    {
+        datasList.add(_toAdd);
+        datasAmount++;
+    }
+    void RemoveSongFromList(const SongTableElement* _toRemove)
+    {
+        for(int i = 0; ++i<datasList.size();)
+        {
+            if(datasList[i] == _toRemove)
+            {
+                datasList.remove(i);
+                break;
+            }
+        }
+        datasAmount--;
+    }
 #pragma endregion Customs
 #pragma endregion Methods
 
 #pragma region Fields
+
 private:
     juce::TableListBox table{{}, this};
     juce::Font font{14.0f};
-    
+
     juce::Colour rowColour;
     juce::Colour rowColour_interpolated;
 

@@ -123,8 +123,9 @@ void CurrentPlayingComponent::resized()
     currentPlayingSlider.setBounds(_widthBy4, _height - _heightBy3, _width / 2, _heightBy3);
 }
 
-void CurrentPlayingComponent::OnSongChoose(SongTableElement& _song)
+void CurrentPlayingComponent::OnSongChose(SongTableElement& _song)
 {
+    //Stops currentPlaying
     if (transportSource.isPlaying())
     {
         stopButtonClicked();

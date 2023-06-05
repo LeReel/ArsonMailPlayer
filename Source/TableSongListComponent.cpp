@@ -15,8 +15,27 @@ TableSongListComponent::~TableSongListComponent()
 {
 }
 
+void TableSongListComponent::cellClicked(int rowNumber, int columnId, const juce::MouseEvent& mouse_event)
+{
+    //If favorite
+    if (columnId == 4)
+    {
+        datasList[rowNumber]->SwitchIsFavorite();
+        if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
+        {
+            _sC->onFavoriteClicked(*datasList[rowNumber]);
+        }
+    }
+}
+
 void TableSongListComponent::cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent& mouse_event)
 {
+    //If favorite
+    if (columnId == 4)
+    {
+        return;
+    }
+
     SetCurrentSelected(rowNumber);
 
     if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
@@ -37,15 +56,24 @@ void TableSongListComponent::paintRowBackground(juce::Graphics& g, int rowNumber
 void TableSongListComponent::paintCell(juce::Graphics& g, int rowNumber, int columnId, int width, int height,
                                        bool rowIsSelected)
 {
-    g.setColour(rowIsSelected || rowNumber == currentSelectionRow
-                    ? juce::Colours::darkorange
-                    : juce::Colours::whitesmoke);
+    g.setColour(/*rowIsSelected ||*/ rowNumber == currentSelectionRow
+                                         ? juce::Colours::darkorange
+                                         : juce::Colours::whitesmoke);
     g.setFont(font);
 
     SongTableElement& _element = *datasList[rowNumber];
 
-    g.drawText(_element.GetStringAttribute(columnsList[columnId - 1]), 2, 0, width - 4, height,
-               juce::Justification::centredLeft, true);
+    const juce::String _attribute = _element.GetStringAttribute(columnsList[columnId - 1]);
+
+    g.drawText(_attribute,
+               2,
+               0,
+               width - 4,
+               height,
+               columnId == 4 //Favorite column
+                   ? juce::Justification::centred
+                   : juce::Justification::centredLeft,
+               true);
 }
 
 void TableSongListComponent::sortOrderChanged(int newSortColumnId, bool isForwards)

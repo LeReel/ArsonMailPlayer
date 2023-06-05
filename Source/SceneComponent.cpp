@@ -4,8 +4,22 @@ SceneComponent::SceneComponent()
 {
     setSize(getWidth(), getHeight());
 
+
     songsList.SetOwner(this);
+    // Adds selected files to songsList
+    songsList.InitTableList({});
     addAndMakeVisible(&songsList);
+
+    favoritesList.SetOwner(this);
+    //! TEMPORARY (init with JSon)
+    favoritesList.InitTableList({});
+    addAndMakeVisible(&favoritesList);
+
+    tabComponent.addTab("Song list", juce::Colours::grey, &songsList, false);
+    tabComponent.addTab("Favorites", juce::Colours::grey, &favoritesList, false);
+
+    addAndMakeVisible(&tabComponent);
+    
     currentPlaying.SetOwner(this);
     addAndMakeVisible(&currentPlaying);
 
@@ -34,8 +48,20 @@ void SceneComponent::resized()
 
     const int _heightMinusBy4 = _height - _heightBy4;
 
-    songsList.setBounds(0, 0, _width, _heightMinusBy4);
+    tabComponent.setBounds(0, 0, _width, _heightMinusBy4);
 
+    // switch (tabComponent.getCurrentTabIndex())
+    // {
+    // case 1:
+    //     songsList.setBounds(0, 0, _width / 2, _heightMinusBy4 / 2);
+    //     break;
+    // case 2:
+    //     favoritesList.setBounds(0, 0, _width / 2, _heightMinusBy4 / 2);
+    // }
+
+    // songsList.setBounds(_width / 8, 0, _width / 4, _heightMinusBy4 / 4);
+    // favoritesList.setBounds(_width / 8, 0, _width / 4, _heightMinusBy4 / 4);
+    
     currentPlaying.setBounds(0, _heightMinusBy4, _width, _heightBy4);
 
     openButton.setBounds(0, _heightMinusBy4, _width / 8, _height / 8);
@@ -43,7 +69,19 @@ void SceneComponent::resized()
 
 void SceneComponent::onSongChose(SongTableElement& _song)
 {
-    currentPlaying.OnSongChoose(_song);
+    currentPlaying.OnSongChose(_song);
+}
+
+void SceneComponent::onFavoriteClicked(SongTableElement& _song)
+{
+    switch (_song.GetIsFavorite())
+    {
+    case true:
+        favoritesList.AddSongToList(&_song);
+        break;
+    case false:
+        favoritesList.RemoveSongFromList(&_song);
+    }
 }
 
 void SceneComponent::openButtonClicked()
@@ -56,11 +94,14 @@ void SceneComponent::openButtonClicked()
     constexpr auto chooserFlags = juce::FileBrowserComponent::openMode |
         juce::FileBrowserComponent::canSelectMultipleItems;
 
+    //TODO: Init tableList with a JSon at first launch of app
+
     chooser->launchAsync(chooserFlags, [this](const juce::FileChooser& _chooser)
     {
-        const juce::Array<juce::File> _files = _chooser.getResults();
-
         // Adds selected files to songsList
-        songsList.InitTableList(_files);
+        songsList.InitTableList(_chooser.getResults());
+
+        //! TEMPORARY (init with JSon)
+        favoritesList.InitTableList({});
     });
 }
