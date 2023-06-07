@@ -30,6 +30,8 @@ private:
     int currentTab = 1;
     
     juce::TabbedComponent tabComponent {juce::TabbedButtonBar::TabsAtLeft};
+
+    juce::MenuBarComponent menuBar;
     
     TableSongListComponent songsList;
     TableSongListComponent favoritesList;

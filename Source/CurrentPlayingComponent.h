@@ -67,6 +67,8 @@ private:
 
     juce::String currentPlayingString;
     juce::String currentPlayingTimeString;
+    
+    std::vector<juce::Button*> transportButtons;
 
     class CurrentPlayingSlider : public juce::Slider
     {

@@ -4,7 +4,6 @@ SceneComponent::SceneComponent()
 {
     setSize(getWidth(), getHeight());
 
-
     songsList.SetOwner(this);
     // Adds selected files to songsList
     songsList.InitTableList({});
@@ -19,11 +18,16 @@ SceneComponent::SceneComponent()
     tabComponent.addTab("Favorites", juce::Colours::grey, &favoritesList, false);
 
     addAndMakeVisible(&tabComponent);
-    
+
     currentPlaying.SetOwner(this);
     addAndMakeVisible(&currentPlaying);
 
-    Utils::InitButton(this, openButton, "Open", [this] { openButtonClicked(); }, juce::Colours::darkslategrey, true);
+    Utils::InitButton(this,
+                      openButton,
+                      "Open",
+                      [this] { openButtonClicked(); },
+                      juce::Colours::darkslategrey,
+                      true);
 }
 
 SceneComponent::~SceneComponent()
@@ -48,20 +52,10 @@ void SceneComponent::resized()
 
     const int _heightMinusBy4 = _height - _heightBy4;
 
+    menuBar.setBounds(0, 0, _width, _heightBy4);
+
     tabComponent.setBounds(0, 0, _width, _heightMinusBy4);
 
-    // switch (tabComponent.getCurrentTabIndex())
-    // {
-    // case 1:
-    //     songsList.setBounds(0, 0, _width / 2, _heightMinusBy4 / 2);
-    //     break;
-    // case 2:
-    //     favoritesList.setBounds(0, 0, _width / 2, _heightMinusBy4 / 2);
-    // }
-
-    // songsList.setBounds(_width / 8, 0, _width / 4, _heightMinusBy4 / 4);
-    // favoritesList.setBounds(_width / 8, 0, _width / 4, _heightMinusBy4 / 4);
-    
     currentPlaying.setBounds(0, _heightMinusBy4, _width, _heightBy4);
 
     openButton.setBounds(0, _heightMinusBy4, _width / 8, _height / 8);
@@ -86,15 +80,26 @@ void SceneComponent::onFavoriteClicked(SongTableElement& _song)
 
 void SceneComponent::openButtonClicked()
 {
-    juce::Array<juce::String> _s = {"*.wav ", "*.mp3"};
-    chooser = std::make_unique<juce::FileChooser>("Select a Wave file to play...",
+    chooser = std::make_unique<juce::FileChooser>("Select audio files to import",
                                                   juce::File{},
-                                                  "*.mp3");
+                                                  "*.mp3;*.wav");
 
     constexpr auto chooserFlags = juce::FileBrowserComponent::openMode |
         juce::FileBrowserComponent::canSelectMultipleItems;
 
-    //TODO: Init tableList with a JSon at first launch of app
+    //TODO: Init tableList with a JSon at first launch of app (retains paths, favorites,...)
+
+    
+    
+    juce::Array<juce::File> _files;
+    juce::Array<juce::String> _paths;
+    const int _pathsSize = _paths.size();
+    for (int i = 0; i < _pathsSize; ++i)
+    {
+        const juce::String _absolutePath = _paths[i];
+        juce::File _file(_absolutePath);
+        _files.add(_file);
+    }
 
     chooser->launchAsync(chooserFlags, [this](const juce::FileChooser& _chooser)
     {

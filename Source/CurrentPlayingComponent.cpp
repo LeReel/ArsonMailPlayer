@@ -12,12 +12,46 @@ CurrentPlayingComponent::CurrentPlayingComponent()
     currentPlayingSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     currentPlayingSlider.SetCurrentPlayingComponent(this);
 
-    Utils::InitButton(this, playButton, "Play", [this] { playButtonClicked(); }, juce::Colours::darkolivegreen, false);
-    Utils::InitButton(this, stopButton, "Stop", [this] { stopButtonClicked(); }, juce::Colours::indianred, false);
-    Utils::InitButton(this, loopButton, "Loop", [this] { loopButtonClicked(); }, juce::Colours::yellow, true);
-    Utils::InitButton(this, loopAllButton, "Loop all", [this] { loopAllButtonClicked(); }, juce::Colours::yellow, true);
-    Utils::InitButton(this, prevButton, "<<", [this] { prevButtonClicked(); }, juce::Colours::darkorange, true);
-    Utils::InitButton(this, nextButton, ">>", [this] { nextButtonClicked(); }, juce::Colours::darkorange, true);
+    Utils::InitButton(this,
+                      transportButtons,
+                      prevButton,
+                      "<<",
+                      [this] { prevButtonClicked(); },
+                      juce::Colours::darkorange,
+                      true);
+    Utils::InitButton(this,
+                      transportButtons,
+                      playButton,
+                      "Play",
+                      [this] { playButtonClicked(); },
+                      juce::Colours::darkolivegreen,
+                      false);
+    Utils::InitButton(this,
+                      transportButtons,
+                      stopButton,
+                      "Stop",
+                      [this] { stopButtonClicked(); },
+                      juce::Colours::indianred,
+                      false);
+    Utils::InitButton(this,
+                      transportButtons,
+                      nextButton,
+                      ">>",
+                      [this] { nextButtonClicked(); },
+                      juce::Colours::darkorange,
+                      true);
+    Utils::InitButton(this,
+                      loopButton,
+                      "Loop",
+                      [this] { loopButtonClicked(); },
+                      juce::Colours::yellow,
+                      true);
+    Utils::InitButton(this,
+                      loopAllButton,
+                      "Loop all",
+                      [this] { loopAllButtonClicked(); },
+                      juce::Colours::yellow,
+                      true);
 
     // Registers a list of standards formats. Creates readers for wav/aiff/mp3
     formatManager.registerBasicFormats();
@@ -72,13 +106,14 @@ void CurrentPlayingComponent::getNextAudioBlock(const juce::AudioSourceChannelIn
 void CurrentPlayingComponent::timerCallback()
 {
     const double _position = transportSource.getCurrentPosition();
+    const juce::int64 _totalLength = transportSource.getTotalLength();
     const juce::RelativeTime _positionRelative(_position);
 
     int _min = static_cast<int>(_positionRelative.inMinutes()) % 60;
     int _sec = static_cast<int>(_positionRelative.inSeconds()) % 60;
     int _mil = static_cast<int>(_positionRelative.inMilliseconds()) % 1000;
 
-    currentPlayingTimeString = juce::String::formatted("%02d:%02d:%03d", _min, _sec, _mil);
+    currentPlayingTimeString = juce::String::formatted("%02d:%02d:%03d / %d", _min, _sec, _mil, _totalLength);
 
     currentPlayingSlider.setValue(_position);
 
@@ -96,7 +131,7 @@ void CurrentPlayingComponent::paint(juce::Graphics& graphics)
                       true);
     graphics.drawText(currentPlayingTimeString,
                       _localBounds,
-                      juce::Justification::centredBottom,
+                      juce::Justification::centred,
                       true);
 }
 
@@ -107,22 +142,24 @@ void CurrentPlayingComponent::resized()
 
     const int _widthBy4 = _width / 4,
               _widthBy8 = _width / 8,
-              _widthBy9 = _width / 9,
               _heightBy2 = _height / 2,
               _heightBy3 = _height / 3,
               _heightBy4 = _height / 4;
     const int _transportButtonsX = _width - _widthBy8;
 
-    playButton.setBounds(_transportButtonsX, 0, _widthBy8, _heightBy3);
-    stopButton.setBounds(_transportButtonsX, _heightBy3, _widthBy8, _heightBy3);
+    const int _buttonAmnt = transportButtons.size();
+    const int _buttonWidth = _width / _buttonAmnt;
 
-    prevButton.setBounds(_widthBy4, _heightBy2, _widthBy9, _heightBy4);
-    nextButton.setBounds(_width - _width / 3, _heightBy2, _widthBy9, _heightBy4);
+    for (int i = 0; i < _buttonAmnt; ++i)
+    {
+        juce::Button* _button = transportButtons[i];
+        _button->setBounds(_widthBy4 * i, _height - _heightBy3, _buttonWidth, _heightBy4);
+    }
 
-    loopButton.setBounds(_transportButtonsX, _height - _heightBy3, _widthBy8, _heightBy3);
-    loopAllButton.setBounds(_transportButtonsX, _height - _heightBy3, _widthBy8, _heightBy3);
+    loopButton.setBounds(_transportButtonsX, (_height - _heightBy3) - 15, _widthBy8, _heightBy4);
+    loopAllButton.setBounds(_transportButtonsX, (_height - _heightBy3) + 15, _widthBy8, _heightBy4);
 
-    currentPlayingSlider.setBounds(_widthBy4, _height - _heightBy3, _width / 2, _heightBy3);
+    currentPlayingSlider.setBounds(_widthBy4, _heightBy4, _width / 2, _heightBy3);
 }
 
 void CurrentPlayingComponent::OnSongChose(SongTableElement& _song)
