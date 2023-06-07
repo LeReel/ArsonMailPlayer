@@ -89,8 +89,17 @@ void SceneComponent::openButtonClicked()
 
     //TODO: Init tableList with a JSon at first launch of app (retains paths, favorites,...)
 
-    
-    
+    //juce::String _jsonPath = "../../Source/songs_infos.json";
+    juce::String _jsonPath = juce::File::getCurrentWorkingDirectory().getFullPathName() +
+        "\\..\\..\\Source\\songs_infos.json";
+    juce::File _jsonFile(_jsonPath);
+    juce::String _jsonString = _jsonFile.loadFileAsString();
+    juce::var _parsedJson;
+    if (juce::JSON::parse(_jsonString, _parsedJson).wasOk())
+    {
+        juce::String _test = _parsedJson["testProperty"];
+    }
+
     juce::Array<juce::File> _files;
     juce::Array<juce::String> _paths;
     const int _pathsSize = _paths.size();
