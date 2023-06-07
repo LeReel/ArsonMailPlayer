@@ -10,5 +10,5 @@ public:
     virtual void SetOwner(IMyComponent* _owner);
 
 protected:
-    juce::Component* componentOwner = nullptr;
+    IMyComponent* componentOwner = nullptr;
 };
