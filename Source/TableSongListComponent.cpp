@@ -56,7 +56,7 @@ void TableSongListComponent::paintRowBackground(juce::Graphics& g, int rowNumber
 void TableSongListComponent::paintCell(juce::Graphics& g, int rowNumber, int columnId, int width, int height,
                                        bool rowIsSelected)
 {
-    g.setColour(/*rowIsSelected ||*/ rowNumber == currentSelectionRow
+    g.setColour(/*rowIsSelected ||*/ rowNumber == currentPlayingRow
                                          ? juce::Colours::darkorange
                                          : juce::Colours::whitesmoke);
     g.setFont(font);
@@ -113,7 +113,7 @@ int TableSongListComponent::getColumnAutoSizeWidth(int columnId)
 
 SongTableElement& TableSongListComponent::GetCurrentSelected() const
 {
-    return *datasList[currentSelectionRow];
+    return *datasList[currentPlayingRow];
 }
 
 void TableSongListComponent::InitTableList(juce::Array<juce::File> _files)
@@ -154,7 +154,7 @@ void TableSongListComponent::SetCurrentSelected(const int rowNumber)
     for (int i = 0; i < _childrenCount; i++)
     {
         const bool _isSelected = rowNumber == -1 ? false : i == rowNumber;
-        if (_isSelected) currentSelectionRow = i;
+        if (_isSelected) currentPlayingRow = i;
     }
 }
 
@@ -185,14 +185,28 @@ void TableSongListComponent::LoadDatas(juce::Array<juce::File> _files)
     datasAmount = datasList.size();
 }
 
-void TableSongListComponent::ChangeCell(int _move)
+void TableSongListComponent::ChangeCell(const int _move, const bool _isLoopAll)
 {
-    if (currentSelectionRow + _move < 0 || currentSelectionRow + _move >= datasAmount)
+    if(datasAmount == 0 || currentPlayingRow == -1) //No LoadedDatas or no CurrentPlaying yet selected
     {
         return;
     }
-    currentSelectionRow += _move;
-    SetCurrentSelected(currentSelectionRow);
+    
+    if (currentPlayingRow + _move < 0 || currentPlayingRow + _move >= datasAmount)
+    {
+        if (!_isLoopAll)
+        {
+            return;
+        }
+        currentPlayingRow = currentPlayingRow + _move < 0
+                                  ? datasAmount - 1
+                                  : 0;
+    }
+    else
+    {
+        currentPlayingRow += _move;
+    }
+    SetCurrentSelected(currentPlayingRow);
 
     if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
     {

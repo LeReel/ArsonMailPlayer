@@ -51,15 +51,19 @@ public:
     void nextButtonClicked();
     void changeSongClicked(const int _move);
     void loopButtonClicked() const;
+    void loopAllButtonClicked();
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CurrentPlayingComponent)
+
+    bool isLoopAll = false;
 
     juce::TextButton playButton;
     juce::TextButton stopButton;
     juce::TextButton prevButton;
     juce::TextButton nextButton;
     juce::ToggleButton loopButton;
+    juce::ToggleButton loopAllButton;
 
     juce::String currentPlayingString;
     juce::String currentPlayingTimeString;

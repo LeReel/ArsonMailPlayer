@@ -15,6 +15,7 @@ CurrentPlayingComponent::CurrentPlayingComponent()
     Utils::InitButton(this, playButton, "Play", [this] { playButtonClicked(); }, juce::Colours::darkolivegreen, false);
     Utils::InitButton(this, stopButton, "Stop", [this] { stopButtonClicked(); }, juce::Colours::indianred, false);
     Utils::InitButton(this, loopButton, "Loop", [this] { loopButtonClicked(); }, juce::Colours::yellow, true);
+    Utils::InitButton(this, loopAllButton, "Loop all", [this] { loopAllButtonClicked(); }, juce::Colours::yellow, true);
     Utils::InitButton(this, prevButton, "<<", [this] { prevButtonClicked(); }, juce::Colours::darkorange, true);
     Utils::InitButton(this, nextButton, ">>", [this] { nextButtonClicked(); }, juce::Colours::darkorange, true);
 
@@ -119,6 +120,7 @@ void CurrentPlayingComponent::resized()
     nextButton.setBounds(_width - _width / 3, _heightBy2, _widthBy9, _heightBy4);
 
     loopButton.setBounds(_transportButtonsX, _height - _heightBy3, _widthBy8, _heightBy3);
+    loopAllButton.setBounds(_transportButtonsX, _height - _heightBy3, _widthBy8, _heightBy3);
 
     currentPlayingSlider.setBounds(_widthBy4, _height - _heightBy3, _width / 2, _heightBy3);
 }
@@ -233,11 +235,16 @@ void CurrentPlayingComponent::changeSongClicked(const int _move)
 {
     if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
     {
-        _sC->GetSongList()->ChangeCell(_move);
+        _sC->GetSongList()->ChangeCell(_move, isLoopAll);
     }
 }
 
 void CurrentPlayingComponent::loopButtonClicked() const
 {
     UpdateLoopState(loopButton.getToggleState());
+}
+
+void CurrentPlayingComponent::loopAllButtonClicked()
+{
+    isLoopAll = loopAllButton.getToggleState();
 }

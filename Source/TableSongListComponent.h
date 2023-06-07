@@ -114,7 +114,7 @@ public:
 
     void InitTableList(juce::Array<juce::File> _files);
     void LoadDatas(juce::Array<juce::File> _files);
-    void ChangeCell(int _move);
+    void ChangeCell(const int _move, const bool _isLoopAll = false);
     /**
      * \brief Get 'Name' attribute from columnList[columnID]
      * \return Element.Name as String
@@ -152,7 +152,7 @@ private:
 
     juce::Array<juce::String> columnsList;
     juce::Array<SongTableElement*> datasList;
-    int datasAmount = 0, currentSelectionRow = 0, currentSelectionColumn = 0;
+    int datasAmount = 0, currentPlayingRow = -1, currentSelectionColumn = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TableSongListComponent)
 #pragma endregion Fields
