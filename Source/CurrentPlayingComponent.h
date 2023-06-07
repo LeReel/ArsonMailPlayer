@@ -49,6 +49,7 @@ public:
     void stopButtonClicked();
     void prevButtonClicked();
     void nextButtonClicked();
+    void changeSongClicked(const int _move);
     void loopButtonClicked() const;
 
 private:

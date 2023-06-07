@@ -221,17 +221,19 @@ void CurrentPlayingComponent::stopButtonClicked()
 
 void CurrentPlayingComponent::prevButtonClicked()
 {
-    if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
-    {
-        _sC->GetSongList()->ChangeCell(-1);
-    }
+    changeSongClicked(-1);
 }
 
 void CurrentPlayingComponent::nextButtonClicked()
 {
+    changeSongClicked(1);
+}
+
+void CurrentPlayingComponent::changeSongClicked(const int _move)
+{
     if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
     {
-        _sC->GetSongList()->ChangeCell(1);
+        _sC->GetSongList()->ChangeCell(_move);
     }
 }
 
