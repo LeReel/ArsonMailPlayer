@@ -156,8 +156,8 @@ void CurrentPlayingComponent::resized()
         _button->setBounds(_widthBy4 * i, _height - _heightBy3, _buttonWidth, _heightBy4);
     }
 
-    loopButton.setBounds(_transportButtonsX, (_height - _heightBy3) - 15, _widthBy8, _heightBy4);
-    loopAllButton.setBounds(_transportButtonsX, (_height - _heightBy3) + 15, _widthBy8, _heightBy4);
+    loopButton.setBounds(_transportButtonsX, _heightBy4 - 15, _widthBy8, _heightBy4);
+    loopAllButton.setBounds(_transportButtonsX, _heightBy4 + 15, _widthBy8, _heightBy4);
 
     currentPlayingSlider.setBounds(_widthBy4, _heightBy4, _width / 2, _heightBy3);
 }
