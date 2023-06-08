@@ -114,7 +114,7 @@ public:
 
     void InitTableList(juce::Array<juce::File> _files);
     void LoadDatas(juce::Array<juce::File> _files);
-    void ChangeCell(const int _move, const bool _isLoopAll = false);
+    void ChangeCell(const int _move, const bool _isLoopAll = false, const bool _isRandom = false);
     /**
      * \brief Get 'Name' attribute from columnList[columnID]
      * \return Element.Name as String

@@ -41,6 +41,12 @@ CurrentPlayingComponent::CurrentPlayingComponent()
                       juce::Colours::darkorange,
                       true);
     Utils::InitButton(this,
+                      randomButton,
+                      "Random",
+                      [this] { randomButtonClicked(); },
+                      juce::Colours::yellow,
+                      true);
+    Utils::InitButton(this,
                       loopButton,
                       "Loop",
                       [this] { loopButtonClicked(); },
@@ -156,8 +162,9 @@ void CurrentPlayingComponent::resized()
         _button->setBounds(_widthBy4 * i, _height - _heightBy3, _buttonWidth, _heightBy4);
     }
 
-    loopButton.setBounds(_transportButtonsX, _heightBy4 - 15, _widthBy8, _heightBy4);
-    loopAllButton.setBounds(_transportButtonsX, _heightBy4 + 15, _widthBy8, _heightBy4);
+    randomButton.setBounds(_transportButtonsX, _heightBy4 - 30, _widthBy8, _heightBy4 - 20);
+    loopButton.setBounds(_transportButtonsX, _heightBy4, _widthBy8, _heightBy4 - 20);
+    loopAllButton.setBounds(_transportButtonsX, _heightBy4 + 30, _widthBy8, _heightBy4 - 20);
 
     currentPlayingSlider.setBounds(_widthBy4, _heightBy4, _width / 2, _heightBy3);
 }
@@ -272,7 +279,7 @@ void CurrentPlayingComponent::changeSongClicked(const int _move)
 {
     if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
     {
-        _sC->GetSongList()->ChangeCell(_move, isLoopAll);
+        _sC->GetSongList()->ChangeCell(_move, isLoopAll, isRandom);
     }
 }
 
@@ -284,4 +291,9 @@ void CurrentPlayingComponent::loopButtonClicked() const
 void CurrentPlayingComponent::loopAllButtonClicked()
 {
     isLoopAll = loopAllButton.getToggleState();
+}
+
+void CurrentPlayingComponent::randomButtonClicked()
+{
+    isRandom = randomButton.getToggleState();
 }
