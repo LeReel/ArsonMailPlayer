@@ -152,6 +152,7 @@ private:
     juce::Colour rowColour;
     juce::Colour rowColour_interpolated;
 
+    juce::Array<int> alreadyPlayedRandom;
     juce::Array<juce::String> columnsList;
     juce::Array<SongTableElement*> datasList;
     int datasAmount = 0, currentPlayingRow = -1, currentSelectionColumn = 0;
