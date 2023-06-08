@@ -126,11 +126,13 @@ public:
         datasList.add(_toAdd);
         datasAmount++;
     }
+
     void RemoveSongFromList(const SongTableElement* _toRemove)
     {
-        for(int i = 0; ++i<datasList.size();)
+        const int _dataSize = datasList.size();
+        for (int i = 0; i < _dataSize; ++i)
         {
-            if(datasList[i] == _toRemove)
+            if (datasList[i] == _toRemove)
             {
                 datasList.remove(i);
                 break;

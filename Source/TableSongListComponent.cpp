@@ -20,10 +20,11 @@ void TableSongListComponent::cellClicked(int rowNumber, int columnId, const juce
     //If favorite
     if (columnId == 4)
     {
-        datasList[rowNumber]->SwitchIsFavorite();
+        SongTableElement* _songElement = datasList[rowNumber];
+        _songElement->SwitchIsFavorite();
         if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
         {
-            _sC->onFavoriteClicked(*datasList[rowNumber]);
+            _sC->onFavoriteClicked(*_songElement);
         }
     }
 }
@@ -60,6 +61,11 @@ void TableSongListComponent::paintCell(juce::Graphics& g, int rowNumber, int col
                                          ? juce::Colours::darkorange
                                          : juce::Colours::whitesmoke);
     g.setFont(font);
+
+    if(rowNumber >= datasList.size())
+    {
+        return;
+    }
 
     SongTableElement& _element = *datasList[rowNumber];
 
