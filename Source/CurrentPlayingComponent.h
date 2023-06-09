@@ -47,9 +47,9 @@ public:
 
     void playButtonClicked();
     void stopButtonClicked();
-    void prevButtonClicked();
-    void nextButtonClicked();
-    void changeSongClicked(const int _move);
+    void prevButtonClicked() const;
+    void nextButtonClicked() const;
+    void changeSongClicked(const int _move) const;
     void loopButtonClicked();
     void loopAllButtonClicked();
     void randomButtonClicked();

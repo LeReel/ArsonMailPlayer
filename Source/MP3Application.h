@@ -18,7 +18,7 @@ public:
     /// <summary>
     /// Any code in that function will be executed as soon as app starts
     /// </summary>
-    void initialise(const juce::String& commandLineParameters) override;
+    void initialise(const juce::String& /*commandLineParams*/) override;
     void shutdown() override;
 };
 

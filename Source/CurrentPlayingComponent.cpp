@@ -114,13 +114,13 @@ void CurrentPlayingComponent::timerCallback()
     const double _position = transportSource.getCurrentPosition(), _totalLength = transportSource.getLengthInSeconds();
     const juce::RelativeTime _relativePosition(_position), _relativeLength(_totalLength);
 
-    int _posMin = static_cast<int>(_relativePosition.inMinutes()) % 60;
-    int _posSec = static_cast<int>(_relativePosition.inSeconds()) % 60;
-    int _posMil = static_cast<int>(_relativePosition.inMilliseconds()) % 1000;
+    const int _posMin = static_cast<int>(_relativePosition.inMinutes()) % 60,
+              _posSec = static_cast<int>(_relativePosition.inSeconds()) % 60,
+              _posMil = static_cast<int>(_relativePosition.inMilliseconds()) % 1000,
 
-    int _totalMin = static_cast<int>(_relativeLength.inMinutes()) % 60;
-    int _totalSec = static_cast<int>(_relativeLength.inSeconds()) % 60;
-    int _totalMil = static_cast<int>(_relativeLength.inMilliseconds()) % 1000;
+              _totalMin = static_cast<int>(_relativeLength.inMinutes()) % 60,
+              _totalSec = static_cast<int>(_relativeLength.inSeconds()) % 60,
+              _totalMil = static_cast<int>(_relativeLength.inMilliseconds()) % 1000;
 
     if (_posMin >= _totalMin)
     {
@@ -133,8 +133,13 @@ void CurrentPlayingComponent::timerCallback()
         }
     }
 
-    currentPlayingTimeString = juce::String::formatted("%02d:%02d:%03d / %02d:%02d:%03d", _posMin, _posSec, _posMil,
-                                                       _totalMin, _totalSec, _totalMil);
+    currentPlayingTimeString = juce::String::formatted("%02d:%02d:%03d / %02d:%02d:%03d",
+                                                       _posMin,
+                                                       _posSec,
+                                                       _posMil,
+                                                       _totalMin,
+                                                       _totalSec,
+                                                       _totalMil);
 
     currentPlayingSlider.setValue(_position);
 
@@ -163,13 +168,11 @@ void CurrentPlayingComponent::resized()
 
     const int _widthBy4 = _width / 4,
               _widthBy8 = _width / 8,
-              _heightBy2 = _height / 2,
               _heightBy3 = _height / 3,
               _heightBy4 = _height / 4;
     const int _transportButtonsX = _width - _widthBy8;
 
-    const int _buttonAmnt = transportButtons.size();
-    const int _buttonWidth = _width / _buttonAmnt;
+    const int _buttonAmnt = transportButtons.size(), _buttonWidth = _width / _buttonAmnt;
 
     for (int i = 0; i < _buttonAmnt; ++i)
     {
@@ -293,19 +296,19 @@ void CurrentPlayingComponent::stopButtonClicked()
         ChangeState(Stopping);
 }
 
-void CurrentPlayingComponent::prevButtonClicked()
+void CurrentPlayingComponent::prevButtonClicked() const
 {
     changeSongClicked(-1);
 }
 
-void CurrentPlayingComponent::nextButtonClicked()
+void CurrentPlayingComponent::nextButtonClicked() const
 {
     changeSongClicked(1);
 }
 
-void CurrentPlayingComponent::changeSongClicked(const int _move)
+void CurrentPlayingComponent::changeSongClicked(const int _move) const
 {
-    if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
+    if (const auto _sC = dynamic_cast<SceneComponent*>(componentOwner))
     {
         _sC->GetSongList()->ChangeCell(_move, isLoopAll, isRandom);
     }

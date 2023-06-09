@@ -19,9 +19,9 @@ MainWindow::MainWindow(const juce::String& _name) : DocumentWindow(
     // in the MainWindow class can figure out the size of the window
     // so that the main component is displayed with the correct size
 
-    centreWithSize(getWidth()*1.5f,getHeight());
+    centreWithSize(getWidth()*2,getHeight());
 
-    setVisible(true);
+    Component::setVisible(true);
 }
 
 void MainWindow::closeButtonPressed()
