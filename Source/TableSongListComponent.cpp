@@ -198,17 +198,20 @@ void TableSongListComponent::ChangeCell(const int _move, const bool _isLoopAll, 
 
     if (_isRandom)
     {
-        int _maxRands = datasAmount / 2;
-        if(alreadyPlayedRandom.size() > _maxRands)
+        const int _maxRands = datasAmount, _alreadyPlayedSize = alreadyPlayedRandom.size();
+        if(_alreadyPlayedSize == _maxRands)
         {
             alreadyPlayedRandom.clear();
         }
         
         int _rand = -1;
+        bool _canExit = false;
         do
         {
             _rand = rand() % datasAmount;
-        }while (_rand == currentPlayingRow && alreadyPlayedRandom.contains(_rand));
+            const bool _isPlaying = _rand == currentPlayingRow, _contains = alreadyPlayedRandom.contains(_rand); 
+            _canExit =  !_isPlaying && !_contains;
+        }while (!_canExit);
 
         alreadyPlayedRandom.add(_rand);
 
