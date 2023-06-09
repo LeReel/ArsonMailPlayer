@@ -1,8 +1,74 @@
 #include "TableSongListComponent.h"
-
-#include <random>
-
 #include "SceneComponent.h"
+
+#include <fstream>
+
+SongTableElement::SongTableElement(const juce::File& _associatedFile)
+{
+    associatedFile = _associatedFile;
+
+    ReadMetadata(_associatedFile);
+    
+    attributes["Favorite"] = "";
+}
+
+void SongTableElement::ReadMetadata(const juce::File& _file)
+{
+    // Reads .mp3 files metadata
+    if (_file.getFileExtension() == ".mp3")
+    {
+        std::ifstream _inputFile;
+        _inputFile.open(_file.getFullPathName().toStdString(), std::ios::in);
+        if (!_inputFile.good())
+        {
+            return;
+        }
+        _inputFile.seekg(0, std::ios::end);
+        int _end = _inputFile.tellg();
+        _inputFile.seekg(_end - 128); // Go to the TAG
+
+        // Skips "TAG" prefix
+        char tag[4];
+        for (int i = 0; i < 3; i++)
+        {
+            tag[i] = _inputFile.get();
+        }
+        tag[3] = '\0';
+
+        char title[31];
+        for (int i = 0; i < 30; i++)
+        {
+            title[i] = _inputFile.get();
+        }
+        if(title == "")
+        {
+            return;
+        }
+        else
+        {
+            title[30] = '\0';
+        }
+        attributes["Title"] = title;
+
+        char artist[31];
+        for (int i = 0; i < 30; i++)
+        {
+            artist[i] = _inputFile.get();
+        }
+        artist[30] = '\0';
+        attributes["Artist"] = artist;
+
+        char album[31];
+        for (int i = 0; i < 30; i++)
+        {
+            album[i] = _inputFile.get();
+        }
+        album[30] = '\0';
+        attributes["Album"] = album;
+
+        _inputFile.close();
+    }
+}
 
 #pragma region TableSongListComponent
 TableSongListComponent::TableSongListComponent()
@@ -186,11 +252,6 @@ void TableSongListComponent::LoadDatas(juce::Array<juce::File> _files)
 
         auto* _element = new SongTableElement(_file);
         const juce::String _title = _element->GetStringAttribute("Title");
-
-        if(_file.getFileExtension() == ".mp3")
-        {
-        }
-        
 
         bool _alreadyInList = false;
 

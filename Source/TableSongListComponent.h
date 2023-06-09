@@ -15,22 +15,7 @@ class SongTableElement
     std::map<juce::String, juce::String> attributes;
 
 public:
-    SongTableElement(juce::File _associatedFile)
-    {
-        associatedFile = _associatedFile;
-
-        for (juce::String _attribute : ATTRIBUTES_LIST)
-        {
-            if (_attribute == "Favorite")
-            {
-                attributes.insert(std::pair<juce::String, juce::String>(_attribute, " "));
-                continue;
-            }
-
-            attributes.insert(std::pair<juce::String, juce::String>(_attribute, "Unknown"));
-        }
-        attributes["Title"] = associatedFile.getFileName();
-    }
+    SongTableElement(const juce::File& _associatedFile);
 
     juce::File& GetAssociatedFile() { return associatedFile; }
 
@@ -59,6 +44,9 @@ public:
     {
         attributes[_attribute] = _value;
     }
+
+private:
+    void ReadMetadata(const juce::File& _file);
 };
 
 class TableSongListComponent : public juce::Component,

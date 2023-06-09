@@ -151,7 +151,7 @@ void CurrentPlayingComponent::paint(juce::Graphics& graphics)
     graphics.setColour(juce::Colours::darkorange);
 
     const juce::Rectangle<int> _localBounds = getLocalBounds();
-    graphics.drawText(currentPlayingString,
+    graphics.drawFittedText(currentPlayingString,
                       _localBounds,
                       juce::Justification::centredTop,
                       true);
@@ -207,7 +207,7 @@ void CurrentPlayingComponent::OnSongChose(SongTableElement& _song)
     readerSource = std::move(_newSource);
     readerSource->setLooping(isLooping);
 
-    currentPlayingString = _song.GetStringAttribute("Title");
+    currentPlayingString = _song.GetStringAttribute("Title") + "\n" + _song.GetStringAttribute("Artist") + "\n" + _song.GetStringAttribute("Album");
     currentPlayingSlider.setRange(0.0, transportSource.getLengthInSeconds());
 
     repaint();
