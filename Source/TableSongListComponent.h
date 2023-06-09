@@ -2,8 +2,6 @@
 
 #include "Utils.h"
 
-class SceneComponent;
-
 const juce::Array<juce::String> ATTRIBUTES_LIST{"Title", "Artist", "Album", "Favorite"};
 
 class SongTableElement
@@ -19,12 +17,12 @@ public:
 
     juce::File& GetAssociatedFile() { return associatedFile; }
 
-    bool GetIsFavorite()
+    bool GetIsFavorite() const
     {
         return isFavorite;
     }
 
-    juce::String GetStringAttribute(juce::String _attribute)
+    juce::String GetStringAttribute(const juce::String& _attribute)
     {
         return attributes[_attribute];
     }
@@ -37,10 +35,10 @@ public:
     void SetIsFavorite(const bool _isFavorite)
     {
         isFavorite = _isFavorite;
-        SetStringAttibute("Favorite", isFavorite ? "X" : "");
+        SetStringAttribute("Favorite", isFavorite ? "X" : "");
     }
 
-    void SetStringAttibute(juce::String _attribute, juce::String _value)
+    void SetStringAttribute(const juce::String& _attribute, const juce::String& _value)
     {
         attributes[_attribute] = _value;
     }
@@ -64,7 +62,7 @@ public:
 
     int getNumRows() override
     {
-        return datasAmount;
+        return dataAmount;
     }
 
     void paintRowBackground(juce::Graphics& g,
@@ -78,7 +76,6 @@ public:
                    int width,
                    int height,
                    bool) override;
-    void sortOrderChanged(int newSortColumnId, bool isForwards) override;
     /**
      * \brief Used to create or update a custom component to go in a cell
      * \return If existingComponentToUpdate is null, then must create a new component suitable for the cell, and return it.
@@ -100,8 +97,8 @@ public:
 
     SongTableElement& GetCurrentSelected() const;
 
-    void InitTableList(juce::Array<juce::File> _files);
-    void LoadDatas(juce::Array<juce::File> _files);
+    void InitTableList(const juce::Array<juce::File>& _files);
+    void LoadData(const juce::Array<juce::File>& _files);
     void ChangeCell(const int _move, const bool _isLoopAll = false, const bool _isRandom = false);
     /**
      * \brief Get 'Name' attribute from columnList[columnID]
@@ -111,8 +108,8 @@ public:
 
     void AddSongToList(SongTableElement* _toAdd)
     {
-        datasList.add(_toAdd);
-        datasAmount++;
+        dataList.add(_toAdd);
+        dataAmount++;
 
         repaint();
         resized();
@@ -120,16 +117,16 @@ public:
 
     void RemoveSongFromList(const SongTableElement* _toRemove)
     {
-        const int _dataSize = datasList.size();
+        const int _dataSize = dataList.size();
         for (int i = 0; i < _dataSize; ++i)
         {
-            if (datasList[i] == _toRemove)
+            if (dataList[i] == _toRemove)
             {
-                datasList.remove(i);
+                dataList.remove(i);
                 break;
             }
         }
-        datasAmount--;
+        dataAmount--;
 
         table.deselectAllRows();
 
@@ -150,25 +147,9 @@ private:
 
     juce::Array<int> alreadyPlayedRandom;
     juce::Array<juce::String> columnsList;
-    juce::Array<SongTableElement*> datasList;
-    int datasAmount = 0, currentPlayingRow = -1, currentSelectionColumn = 0;
+    juce::Array<SongTableElement*> dataList;
+    int dataAmount = 0, currentPlayingRow = -1, currentSelectionColumn = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TableSongListComponent)
 #pragma endregion Fields
-};
-
-class DataSorter
-{
-public:
-    DataSorter(const juce::String& attributeToSortBy, bool forwards)
-        : attributeToSort(attributeToSortBy),
-          direction(forwards ? 1 : -1)
-    {
-    }
-
-    int compareElements(const juce::XmlElement* first, const juce::XmlElement* second) const;
-
-private:
-    juce::String attributeToSort;
-    int direction = 0;
 };

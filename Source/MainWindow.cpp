@@ -2,7 +2,7 @@
 
 MainWindow::MainWindow(const juce::String& _name) : DocumentWindow(
     _name,
-    juce::Colours::transparentBlack,
+    juce::Colours::coral,
     allButtons)
 {
     setUsingNativeTitleBar(false); // Can't be transparent with native
@@ -11,7 +11,7 @@ MainWindow::MainWindow(const juce::String& _name) : DocumentWindow(
     // and will automatically destroy it as its destructor is called
     setContentOwned(new MainComponent(), true);
 
-    setResizable(true, true);
+    setResizable(true, false);
     
     // The MainComponent object's size gets set in its own constructor
     // before the MainWindow object is positioned and sized.

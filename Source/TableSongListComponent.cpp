@@ -3,12 +3,13 @@
 
 #include <fstream>
 
+#pragma region SongTableElement
 SongTableElement::SongTableElement(const juce::File& _associatedFile)
 {
     associatedFile = _associatedFile;
 
     ReadMetadata(_associatedFile);
-    
+
     attributes["Favorite"] = "";
 }
 
@@ -24,7 +25,7 @@ void SongTableElement::ReadMetadata(const juce::File& _file)
             return;
         }
         _inputFile.seekg(0, std::ios::end);
-        int _end = _inputFile.tellg();
+        const int _end = _inputFile.tellg();
         _inputFile.seekg(_end - 128); // Go to the TAG
 
         // Skips "TAG" prefix
@@ -40,7 +41,7 @@ void SongTableElement::ReadMetadata(const juce::File& _file)
         {
             title[i] = _inputFile.get();
         }
-        if(title == "")
+        if (title == "")
         {
             return;
         }
@@ -69,6 +70,7 @@ void SongTableElement::ReadMetadata(const juce::File& _file)
         _inputFile.close();
     }
 }
+#pragma endregion SongTableElement
 
 #pragma region TableSongListComponent
 TableSongListComponent::TableSongListComponent()
@@ -80,9 +82,7 @@ TableSongListComponent::TableSongListComponent()
                                                         0.03f);
 }
 
-TableSongListComponent::~TableSongListComponent()
-{
-}
+TableSongListComponent::~TableSongListComponent() = default;
 
 void TableSongListComponent::cellClicked(int rowNumber, int columnId, const juce::MouseEvent&)
 {
@@ -92,7 +92,7 @@ void TableSongListComponent::cellClicked(int rowNumber, int columnId, const juce
         return;
     }
 
-    SongTableElement* _songElement = datasList[rowNumber];
+    SongTableElement* _songElement = dataList[rowNumber];
     if (!_songElement)
     {
         return;
@@ -102,6 +102,7 @@ void TableSongListComponent::cellClicked(int rowNumber, int columnId, const juce
     {
         _sC->onFavoriteClicked(*_songElement);
     }
+    table.updateContent();
 }
 
 void TableSongListComponent::cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent&)
@@ -118,6 +119,7 @@ void TableSongListComponent::cellDoubleClicked(int rowNumber, int columnId, cons
     {
         _sC->onSongChose(GetCurrentSelected());
     }
+    table.updateContent();
 }
 
 void TableSongListComponent::paintRowBackground(juce::Graphics& g,
@@ -139,17 +141,17 @@ void TableSongListComponent::paintCell(juce::Graphics& g,
                                        int height,
                                        bool)
 {
-    g.setColour(/*rowIsSelected ||*/ rowNumber == currentPlayingRow
-                                         ? juce::Colours::darkorange
-                                         : juce::Colours::whitesmoke);
+    g.setColour(rowNumber == currentPlayingRow
+                    ? juce::Colours::darkorange
+                    : juce::Colours::whitesmoke);
     g.setFont(font);
 
-    if (rowNumber >= datasList.size())
+    if (rowNumber >= dataList.size())
     {
         return;
     }
 
-    SongTableElement& _element = *datasList[rowNumber];
+    SongTableElement& _element = *dataList[rowNumber];
 
     const juce::String _attribute = _element.GetStringAttribute(columnsList[columnId - 1]);
 
@@ -162,17 +164,6 @@ void TableSongListComponent::paintCell(juce::Graphics& g,
                    ? juce::Justification::centred
                    : juce::Justification::centredLeft,
                true);
-}
-
-void TableSongListComponent::sortOrderChanged(int newSortColumnId, bool isForwards)
-{
-    if (newSortColumnId != 0)
-    {
-        // DataSorter sorter(GetColumnNameAttribute(newSortColumnId), isForwards);
-        // datasList.sort(sorter);
-        // 
-        table.updateContent();
-    }
 }
 
 juce::Component* TableSongListComponent::refreshComponentForCell(int,
@@ -191,7 +182,7 @@ int TableSongListComponent::getColumnAutoSizeWidth(int columnId)
 
     for (int i = _numRows; --i >= 0;)
     {
-        SongTableElement& _element = *datasList[i];
+        SongTableElement& _element = *dataList[i];
 
         juce::String _text = _element.GetStringAttribute(GetColumnNameAttribute(columnId - 1));
 
@@ -203,14 +194,14 @@ int TableSongListComponent::getColumnAutoSizeWidth(int columnId)
 
 SongTableElement& TableSongListComponent::GetCurrentSelected() const
 {
-    return *datasList[currentPlayingRow];
+    return *dataList[currentPlayingRow];
 }
 
-void TableSongListComponent::InitTableList(juce::Array<juce::File> _files)
+void TableSongListComponent::InitTableList(const juce::Array<juce::File>& _files)
 {
     const bool _isFirstInit = table.getHeader().getNumColumns(false) == 0;
 
-    LoadDatas(_files);
+    LoadData(_files);
 
     if (_isFirstInit)
     {
@@ -224,7 +215,7 @@ void TableSongListComponent::InitTableList(juce::Array<juce::File> _files)
                                         getColumnAutoSizeWidth(_columnId),
                                         50,
                                         400,
-                                        juce::TableHeaderComponent::defaultFlags);
+                                        juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
         }
 
         table.getHeader().setColour(juce::TableHeaderComponent::backgroundColourId, juce::Colours::rebeccapurple);
@@ -243,9 +234,9 @@ void TableSongListComponent::SetCurrentSelected(const int rowNumber)
     currentPlayingRow = rowNumber;
 }
 
-void TableSongListComponent::LoadDatas(juce::Array<juce::File> _files)
+void TableSongListComponent::LoadData(const juce::Array<juce::File>& _files)
 {
-    for (juce::File _file : _files)
+    for (const auto& _file : _files)
     {
         if (_file == juce::File() || !_file.exists())
             return;
@@ -255,7 +246,7 @@ void TableSongListComponent::LoadDatas(juce::Array<juce::File> _files)
 
         bool _alreadyInList = false;
 
-        for (SongTableElement* _data : datasList)
+        for (SongTableElement* _data : dataList)
         {
             if (_data->GetStringAttribute("Title") == _title)
             {
@@ -264,22 +255,22 @@ void TableSongListComponent::LoadDatas(juce::Array<juce::File> _files)
             }
         }
 
-        if (!_alreadyInList) datasList.add(_element);
+        if (!_alreadyInList) dataList.add(_element);
     }
 
-    datasAmount = datasList.size();
+    dataAmount = dataList.size();
 }
 
 void TableSongListComponent::ChangeCell(const int _move, const bool _isLoopAll, const bool _isRandom)
 {
-    if (datasAmount == 0 || currentPlayingRow == -1) //No LoadedDatas or no CurrentPlaying yet selected
+    if (dataAmount == 0 || currentPlayingRow == -1) //No LoadedDatas or no CurrentPlaying yet selected
     {
         return;
     }
 
     if (_isRandom)
     {
-        const int _maxRands = datasAmount, _alreadyPlayedSize = alreadyPlayedRandom.size();
+        const int _maxRands = dataAmount, _alreadyPlayedSize = alreadyPlayedRandom.size();
         if (_alreadyPlayedSize == _maxRands)
         {
             alreadyPlayedRandom.clear();
@@ -289,7 +280,7 @@ void TableSongListComponent::ChangeCell(const int _move, const bool _isLoopAll, 
         bool _canExit = false;
         do
         {
-            _rand = rand() % datasAmount;
+            _rand = rand() % dataAmount;
             const bool _isPlaying = _rand == currentPlayingRow, _contains = alreadyPlayedRandom.contains(_rand);
             _canExit = !_isPlaying && !_contains;
         }
@@ -299,14 +290,14 @@ void TableSongListComponent::ChangeCell(const int _move, const bool _isLoopAll, 
 
         currentPlayingRow = _rand;
     }
-    else if (currentPlayingRow + _move < 0 || currentPlayingRow + _move >= datasAmount)
+    else if (currentPlayingRow + _move < 0 || currentPlayingRow + _move >= dataAmount)
     {
         if (!_isLoopAll)
         {
             return;
         }
         currentPlayingRow = currentPlayingRow + _move < 0
-                                ? datasAmount - 1
+                                ? dataAmount - 1
                                 : 0;
     }
     else
@@ -325,19 +316,3 @@ juce::String TableSongListComponent::GetColumnNameAttribute(int _columnId) const
     return columnsList[_columnId];
 }
 #pragma endregion TableSongListComponent
-
-#pragma region DataSorter
-int DataSorter::compareElements(const juce::XmlElement* first, const juce::XmlElement* second) const
-{
-    return 0;
-
-    // int result = first->getStringAttribute(attributeToSort)
-    //                   .compareNatural(second->getStringAttribute(attributeToSort));
-    //
-    // if (result == 0)
-    //     result = first->getStringAttribute("ID")
-    //                   .compareNatural(second->getStringAttribute("ID"));
-    //
-    // return direction * result;
-}
-#pragma endregion DataSorter

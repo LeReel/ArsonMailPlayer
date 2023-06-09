@@ -7,9 +7,7 @@ class MP3Application : public juce::JUCEApplication
     std::unique_ptr<MainWindow> mainWindow;
 
 public:
-    MP3Application()
-    {
-    }
+    MP3Application() = default;
 
     const juce::String getApplicationName() override { return ProjectInfo::projectName; }
     const juce::String getApplicationVersion() override { return ProjectInfo::versionString; }

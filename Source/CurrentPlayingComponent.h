@@ -40,7 +40,7 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
 
-    void OnSongChose(SongTableElement& _file);
+    void OnSongChose(SongTableElement& _song);
     void ChangeState(TransportState _state);
     void UpdateLoopState(bool _shouldLoop);
     void UpdateCurrentPlayingPosition(double _newPosition);
@@ -97,7 +97,7 @@ private:
             currentPlayingComponent = _currentPlayingComponent;
         }
 
-        CurrentPlayingComponent& GetCurrentPlayingComponent()
+        CurrentPlayingComponent& GetCurrentPlayingComponent() const
         {
             return *currentPlayingComponent;
         }
