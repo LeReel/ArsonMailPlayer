@@ -18,21 +18,27 @@ TableSongListComponent::~TableSongListComponent()
 {
 }
 
-void TableSongListComponent::cellClicked(int rowNumber, int columnId, const juce::MouseEvent& mouse_event)
+void TableSongListComponent::cellClicked(int rowNumber, int columnId, const juce::MouseEvent&)
 {
-    //If favorite
-    if (columnId == 4)
+    //If not Favorite cell
+    if (columnId != 4)
     {
-        SongTableElement* _songElement = datasList[rowNumber];
-        _songElement->SwitchIsFavorite();
-        if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
-        {
-            _sC->onFavoriteClicked(*_songElement);
-        }
+        return;
+    }
+
+    SongTableElement* _songElement = datasList[rowNumber];
+    if (!_songElement)
+    {
+        return;
+    }
+    _songElement->SwitchIsFavorite();
+    if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
+    {
+        _sC->onFavoriteClicked(*_songElement);
     }
 }
 
-void TableSongListComponent::cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent& mouse_event)
+void TableSongListComponent::cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent&)
 {
     //If favorite
     if (columnId == 4)
@@ -48,7 +54,10 @@ void TableSongListComponent::cellDoubleClicked(int rowNumber, int columnId, cons
     }
 }
 
-void TableSongListComponent::paintRowBackground(juce::Graphics& g, int rowNumber, int width, int height,
+void TableSongListComponent::paintRowBackground(juce::Graphics& g,
+                                                int rowNumber,
+                                                int,
+                                                int,
                                                 bool rowIsSelected)
 {
     if (rowIsSelected)
@@ -57,8 +66,12 @@ void TableSongListComponent::paintRowBackground(juce::Graphics& g, int rowNumber
         g.fillAll(rowColour_interpolated);
 }
 
-void TableSongListComponent::paintCell(juce::Graphics& g, int rowNumber, int columnId, int width, int height,
-                                       bool rowIsSelected)
+void TableSongListComponent::paintCell(juce::Graphics& g,
+                                       int rowNumber,
+                                       int columnId,
+                                       int width,
+                                       int height,
+                                       bool)
 {
     g.setColour(/*rowIsSelected ||*/ rowNumber == currentPlayingRow
                                          ? juce::Colours::darkorange
@@ -96,7 +109,9 @@ void TableSongListComponent::sortOrderChanged(int newSortColumnId, bool isForwar
     }
 }
 
-juce::Component* TableSongListComponent::refreshComponentForCell(int rowNumber, int columnId, bool cond,
+juce::Component* TableSongListComponent::refreshComponentForCell(int,
+                                                                 int,
+                                                                 bool,
                                                                  Component* existingComponentToUpdate)
 {
     jassert(existingComponentToUpdate == nullptr);
@@ -172,6 +187,11 @@ void TableSongListComponent::LoadDatas(juce::Array<juce::File> _files)
         auto* _element = new SongTableElement(_file);
         const juce::String _title = _element->GetStringAttribute("Title");
 
+        if(_file.getFileExtension() == ".mp3")
+        {
+        }
+        
+
         bool _alreadyInList = false;
 
         for (SongTableElement* _data : datasList)
@@ -199,19 +219,20 @@ void TableSongListComponent::ChangeCell(const int _move, const bool _isLoopAll, 
     if (_isRandom)
     {
         const int _maxRands = datasAmount, _alreadyPlayedSize = alreadyPlayedRandom.size();
-        if(_alreadyPlayedSize == _maxRands)
+        if (_alreadyPlayedSize == _maxRands)
         {
             alreadyPlayedRandom.clear();
         }
-        
+
         int _rand = -1;
         bool _canExit = false;
         do
         {
             _rand = rand() % datasAmount;
-            const bool _isPlaying = _rand == currentPlayingRow, _contains = alreadyPlayedRandom.contains(_rand); 
-            _canExit =  !_isPlaying && !_contains;
-        }while (!_canExit);
+            const bool _isPlaying = _rand == currentPlayingRow, _contains = alreadyPlayedRandom.contains(_rand);
+            _canExit = !_isPlaying && !_contains;
+        }
+        while (!_canExit);
 
         alreadyPlayedRandom.add(_rand);
 

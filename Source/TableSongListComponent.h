@@ -81,23 +81,23 @@ public:
 
     void paintRowBackground(juce::Graphics& g,
                             int rowNumber,
-                            int width,
-                            int height,
+                            int /*width*/,
+                            int /*height*/,
                             bool rowIsSelected) override;
     void paintCell(juce::Graphics& g,
                    int rowNumber,
                    int columnId,
                    int width,
                    int height,
-                   bool rowIsSelected) override;
+                   bool) override;
     void sortOrderChanged(int newSortColumnId, bool isForwards) override;
     /**
      * \brief Used to create or update a custom component to go in a cell
      * \return If existingComponentToUpdate is null, then must create a new component suitable for the cell, and return it.
      */
-    Component* refreshComponentForCell(int rowNumber,
-                                       int columnId,
-                                       bool isRowSelected,
+    Component* refreshComponentForCell(int /*rowNumber*/,
+                                       int /*columnId*/,
+                                       bool /*isRowSelected*/,
                                        Component* existingComponentToUpdate) override;
     int getColumnAutoSizeWidth(int columnId) override;
 
@@ -125,6 +125,9 @@ public:
     {
         datasList.add(_toAdd);
         datasAmount++;
+
+        repaint();
+        resized();
     }
 
     void RemoveSongFromList(const SongTableElement* _toRemove)
@@ -139,6 +142,11 @@ public:
             }
         }
         datasAmount--;
+
+        table.deselectAllRows();
+
+        repaint();
+        resized();
     }
 #pragma endregion Customs
 #pragma endregion Methods
