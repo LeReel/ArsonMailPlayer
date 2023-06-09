@@ -111,15 +111,30 @@ void CurrentPlayingComponent::getNextAudioBlock(const juce::AudioSourceChannelIn
 
 void CurrentPlayingComponent::timerCallback()
 {
-    const double _position = transportSource.getCurrentPosition();
-    const juce::int64 _totalLength = transportSource.getTotalLength();
-    const juce::RelativeTime _positionRelative(_position);
+    const double _position = transportSource.getCurrentPosition(), _totalLength = transportSource.getLengthInSeconds();
+    const juce::RelativeTime _relativePosition(_position), _relativeLength(_totalLength);
 
-    int _min = static_cast<int>(_positionRelative.inMinutes()) % 60;
-    int _sec = static_cast<int>(_positionRelative.inSeconds()) % 60;
-    int _mil = static_cast<int>(_positionRelative.inMilliseconds()) % 1000;
+    int _posMin = static_cast<int>(_relativePosition.inMinutes()) % 60;
+    int _posSec = static_cast<int>(_relativePosition.inSeconds()) % 60;
+    int _posMil = static_cast<int>(_relativePosition.inMilliseconds()) % 1000;
 
-    currentPlayingTimeString = juce::String::formatted("%02d:%02d:%03d / %d", _min, _sec, _mil, _totalLength);
+    int _totalMin = static_cast<int>(_relativeLength.inMinutes()) % 60;
+    int _totalSec = static_cast<int>(_relativeLength.inSeconds()) % 60;
+    int _totalMil = static_cast<int>(_relativeLength.inMilliseconds()) % 1000;
+
+    if (_posMin >= _totalMin)
+    {
+        if (_posSec >= _totalSec)
+        {
+            if (_posMil >= _totalMil)
+            {
+                isSongFinished = true;
+            }
+        }
+    }
+
+    currentPlayingTimeString = juce::String::formatted("%02d:%02d:%03d / %02d:%02d:%03d", _posMin, _posSec, _posMil,
+                                                       _totalMin, _totalSec, _totalMil);
 
     currentPlayingSlider.setValue(_position);
 
@@ -187,6 +202,7 @@ void CurrentPlayingComponent::OnSongChose(SongTableElement& _song)
     transportSource.setSource(_newSource.get(), 0, nullptr, _reader->sampleRate);
     playButton.setEnabled(true);
     readerSource = std::move(_newSource);
+    readerSource->setLooping(isLooping);
 
     currentPlayingString = _song.GetStringAttribute("Title");
     currentPlayingSlider.setRange(0.0, transportSource.getLengthInSeconds());
@@ -206,11 +222,22 @@ void CurrentPlayingComponent::ChangeState(TransportState _state)
     switch (currentState)
     {
     case Stopped:
-        playButton.setButtonText("Play");
-        stopButton.setButtonText("Stop");
-        stopButton.setEnabled(false);
-        playButton.setEnabled(true);
-        transportSource.setPosition(0.0);
+        if (isSongFinished)
+        {
+            isSongFinished = false;
+            if (!isLooping)
+            {
+                nextButtonClicked();
+            }
+        }
+        else //If stop is clicked
+        {
+            playButton.setButtonText("Play");
+            stopButton.setButtonText("Stop");
+            stopButton.setEnabled(false);
+            playButton.setEnabled(true);
+            transportSource.setPosition(0.0);
+        }
         break;
 
     case Starting:
@@ -238,10 +265,11 @@ void CurrentPlayingComponent::ChangeState(TransportState _state)
     }
 }
 
-void CurrentPlayingComponent::UpdateLoopState(bool _shouldLoop) const
+void CurrentPlayingComponent::UpdateLoopState(bool _shouldLoop)
 {
     if (!readerSource)return;
-    readerSource->setLooping(_shouldLoop);
+    isLooping = _shouldLoop;
+    readerSource->setLooping(isLooping);
 }
 
 void CurrentPlayingComponent::UpdateCurrentPlayingPosition(double _newPosition)
@@ -283,7 +311,7 @@ void CurrentPlayingComponent::changeSongClicked(const int _move)
     }
 }
 
-void CurrentPlayingComponent::loopButtonClicked() const
+void CurrentPlayingComponent::loopButtonClicked()
 {
     UpdateLoopState(loopButton.getToggleState());
 }

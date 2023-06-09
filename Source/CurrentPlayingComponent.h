@@ -42,7 +42,7 @@ public:
 
     void OnSongChose(SongTableElement& _file);
     void ChangeState(TransportState _state);
-    void UpdateLoopState(bool _shouldLoop) const;
+    void UpdateLoopState(bool _shouldLoop);
     void UpdateCurrentPlayingPosition(double _newPosition);
 
     void playButtonClicked();
@@ -50,15 +50,18 @@ public:
     void prevButtonClicked();
     void nextButtonClicked();
     void changeSongClicked(const int _move);
-    void loopButtonClicked() const;
+    void loopButtonClicked();
     void loopAllButtonClicked();
     void randomButtonClicked();
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CurrentPlayingComponent)
 
+    bool isLooping = false;
     bool isLoopAll = false;
     bool isRandom = false;
+    
+    bool isSongFinished = false;
 
     juce::TextButton playButton;
     juce::TextButton stopButton;
