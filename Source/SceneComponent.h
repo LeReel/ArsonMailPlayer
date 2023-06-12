@@ -19,6 +19,19 @@ public:
         return &songsList;
     }
 
+    TableSongListComponent* GetActiveList()
+    {
+        switch (tabComponent.getCurrentTabIndex())
+        {
+        case 0: //SongList
+            return &songsList;
+        case 1: //FavoriteList
+            return &favoritesList;
+        default:
+            return nullptr;
+        }
+    }
+
     /// Event functions
     void onSongChose(SongTableElement& _song);
     void onFavoriteClicked(SongTableElement& _song);
@@ -31,7 +44,7 @@ private:
 
     int currentTab = 1;
 
-    juce::TabbedComponent tabComponent {juce::TabbedButtonBar::TabsAtLeft};
+    juce::TabbedComponent tabComponent{juce::TabbedButtonBar::TabsAtLeft};
 
     juce::MenuBarComponent menuBar;
 

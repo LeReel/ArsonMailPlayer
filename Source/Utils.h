@@ -19,4 +19,12 @@ namespace Utils
                     bool _isEnabled);
 
     void SetComponentOwner(IMyComponent* _owned, IMyComponent* _owner);
+
+    juce::Array<juce::File> LoadSongListFromJson();
+
+    inline juce::String GetJsonFilePath()
+    {
+        return juce::File::getCurrentWorkingDirectory().getFullPathName() +
+            R"(\..\..\Source\songs_infos.json)";
+    }
 }

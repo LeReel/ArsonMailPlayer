@@ -310,7 +310,7 @@ void CurrentPlayingComponent::changeSongClicked(const int _move) const
 {
     if (const auto _sC = dynamic_cast<SceneComponent*>(componentOwner))
     {
-        _sC->GetSongList()->ChangeCell(_move, isLoopAll, isRandom);
+        _sC->GetActiveList()->ChangeCell(_move, isLoopAll, isRandom);
     }
 }
 
