@@ -98,10 +98,14 @@ void TableSongListComponent::cellClicked(int rowNumber, int columnId, const juce
         return;
     }
     _songElement->SwitchIsFavorite();
+
     if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
     {
         _sC->onFavoriteClicked(*_songElement);
     }
+
+    repaint();
+    resized();
     table.updateContent();
 }
 
@@ -145,11 +149,6 @@ void TableSongListComponent::paintCell(juce::Graphics& g,
                     ? juce::Colours::darkorange
                     : juce::Colours::whitesmoke);
     g.setFont(font);
-
-    if (rowNumber >= dataList.size())
-    {
-        return;
-    }
 
     SongTableElement& _element = *dataList[rowNumber];
 
@@ -232,6 +231,18 @@ void TableSongListComponent::InitTableList(const juce::Array<juce::File>& _files
 void TableSongListComponent::SetCurrentSelected(const int rowNumber)
 {
     currentPlayingRow = rowNumber;
+}
+
+void TableSongListComponent::SetCurrentSelected(const SongTableElement& _songElement)
+{
+    for(int i = 0; i < dataAmount; ++i)
+    {
+        if(dataList[i] == &_songElement)
+        {
+            currentPlayingRow = i;
+            break;
+        }
+    }
 }
 
 void TableSongListComponent::LoadData(const juce::Array<juce::File>& _files)

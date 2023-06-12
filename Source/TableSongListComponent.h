@@ -94,6 +94,7 @@ public:
 #pragma endregion Overrides
 #pragma region Customs
     void SetCurrentSelected(const int rowNumber);
+    void SetCurrentSelected(const SongTableElement& _songElement);
 
     SongTableElement& GetCurrentSelected() const;
 
@@ -111,6 +112,8 @@ public:
         dataList.add(_toAdd);
         dataAmount++;
 
+
+        table.updateContent();
         repaint();
         resized();
     }
@@ -130,6 +133,7 @@ public:
 
         table.deselectAllRows();
 
+        table.updateContent();
         repaint();
         resized();
     }

@@ -6,16 +6,19 @@ SceneComponent::SceneComponent()
 
     songsList.SetOwner(this);
     // Adds selected files to songsList
+    //! TEMPORARY (init with JSon)
     songsList.InitTableList({});
     addAndMakeVisible(&songsList);
 
     favoritesList.SetOwner(this);
-    //! TEMPORARY (init with JSon)
     favoritesList.InitTableList({});
     addAndMakeVisible(&favoritesList);
 
     tabComponent.addTab("Song list", juce::Colours::grey, &songsList, false);
     tabComponent.addTab("Favorites", juce::Colours::grey, &favoritesList, false);
+
+    tabComponent.getTabbedButtonBar().getTabButton(0)->addListener(this);
+    tabComponent.getTabbedButtonBar().getTabButton(1)->addListener(this);
 
     addAndMakeVisible(&tabComponent);
 
@@ -64,6 +67,18 @@ void SceneComponent::resized()
 void SceneComponent::onSongChose(SongTableElement& _song)
 {
     currentPlaying.OnSongChose(_song);
+
+    if (tabComponent.getCurrentTabIndex() == 0) //If Songlist
+    {
+        favoritesList.SetCurrentSelected(_song);
+    }
+    else if (tabComponent.getCurrentTabIndex() == 1) //If FavoriteList
+    {
+        songsList.SetCurrentSelected(_song);
+    }
+
+    repaint();
+    resized();
 }
 
 void SceneComponent::onFavoriteClicked(SongTableElement& _song)
@@ -76,6 +91,15 @@ void SceneComponent::onFavoriteClicked(SongTableElement& _song)
     case false:
         favoritesList.RemoveSongFromList(&_song);
     }
+
+    repaint();
+    resized();
+}
+
+void SceneComponent::buttonClicked(juce::Button* _button)
+{
+    resized();
+    repaint();
 }
 
 void SceneComponent::openButtonClicked()
@@ -116,6 +140,6 @@ void SceneComponent::openButtonClicked()
         songsList.InitTableList(_chooser.getResults());
 
         //! TEMPORARY (init with JSon)
-        favoritesList.InitTableList({});
+        favoritesList.InitTableList({/*favoriteElements*/});
     });
 }
