@@ -117,6 +117,7 @@ void SceneComponent::openButtonClicked()
 
     chooser->launchAsync(chooserFlags, [this](const juce::FileChooser& _chooser)
     {
+        //TODO: Store this method in Utils ?
         // Create File variable from given path
         juce::File _jsonFile(Utils::GetJsonFilePath());
         // Reads JSON and convert it to String
