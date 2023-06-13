@@ -1,4 +1,10 @@
 {
-	"paths": [
-	]
+  "paths": [
+  ],
+  "test": [
+    "coucou",
+    "coucou2",
+    "coucouc3",
+    "coucouc4"
+  ]
 }

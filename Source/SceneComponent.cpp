@@ -8,12 +8,12 @@ SceneComponent::SceneComponent()
 
     songsList.SetOwner(this);
     // Adds selected files to songsList
-    //TODO: uncomment when writingToJsonFile is done
-    // songsList.InitTableList(_songFiles);
+    songsList.InitTableList(_songFiles);
     songsList.InitTableList({});
     addAndMakeVisible(&songsList);
 
     favoritesList.SetOwner(this);
+    //TODO: Init with registered favorites
     favoritesList.InitTableList({});
     addAndMakeVisible(&favoritesList);
 
@@ -110,30 +110,39 @@ void SceneComponent::openButtonClicked()
     chooser = std::make_unique<juce::FileChooser>("Select folder to import",
                                                   juce::File{});
 
-    constexpr auto chooserFlags = juce::FileBrowserComponent::openMode |
-        juce::FileBrowserComponent::canSelectDirectories;
+    constexpr auto chooserFlags =
+        juce::FileBrowserComponent::openMode |
+        juce::FileBrowserComponent::canSelectDirectories |
+        juce::FileBrowserComponent::canSelectMultipleItems;
 
     chooser->launchAsync(chooserFlags, [this](const juce::FileChooser& _chooser)
     {
-        //TODO: Write selected folder to Json
-        const juce::String _jsonPath = Utils::GetJsonFilePath();
-        juce::File _jsonFile(_jsonPath);
+        // Create File variable from given path
+        juce::File _jsonFile(Utils::GetJsonFilePath());
+        // Reads JSON and convert it to String
+        juce::String _jsonString = _jsonFile.loadFileAsString();
+        // Create a var that will store JSON structure
+        juce::var _parsedJson;
+        // Parse the JSON string
+        juce::JSON::parse(_jsonString, _parsedJson);
+        // Retrieve paths array as var
+        juce::var _paths = _parsedJson.getProperty("paths", 0);
+        // Append selected folders' path to array
+        for (auto _result : _chooser.getResults())
+        {
+            juce::String _path = _result.getFullPathName();
+            //TODO: Check if path is already stored
+            _paths.append(_path);
+        }
 
-        Utils::
+        juce::String _string = juce::JSON::toString(_parsedJson);
 
-        auto _obj = std::make_unique<juce::DynamicObject>();
-        _obj->setProperty("paths", "path1");
-        auto _jsonVar = juce::var(_obj.release());
-        juce::FileOutputStream _output(_jsonFile);
-        juce::JSON::writeToStream(_output, _jsonVar);
-        
+        jassert(_jsonFile.replaceWithText(_string));
+
         const juce::Array<juce::File> _children = _chooser.getResult().findChildFiles(2, true, "*.mp3");
         // Adds selected files to songsList
         songsList.InitTableList(_children);
 
-        //! Init with JSon (?)
         favoritesList.InitTableList({/*favoriteElements*/});
     });
 }
-
-//		"C:\\Users\\GUYO0208\\Music\\Musique\\DirtyWater"
