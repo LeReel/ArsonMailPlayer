@@ -27,8 +27,10 @@ namespace Utils
 
     inline juce::String GetJsonFilePath()
     {
+        //TODO: check if launched from IDE or .exe
         return juce::File::getCurrentWorkingDirectory().getFullPathName() +
-            R"(\..\..\Source\songs_infos.json)";
+            //R"(\..\..\Source\songs_infos.json)"; //If from IDE
+            R"(\..\..\..\..\..\Source\songs_infos.json)"; //If from .exe
     }
 
     inline juce::File GetJSONFile()
