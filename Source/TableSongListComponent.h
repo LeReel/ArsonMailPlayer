@@ -45,6 +45,9 @@ public:
 
 private:
     void ReadMetadata(const juce::File& _file);
+    void SetMetadataAttribute(std::ifstream& _file,
+                               std::map<juce::String, juce::String>& _attributesMap,
+                               const juce::String& _attributeKey);
 };
 
 class TableSongListComponent : public juce::Component,
