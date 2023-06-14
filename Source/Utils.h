@@ -33,7 +33,15 @@ namespace Utils
 
     inline juce::File GetJSONFile()
     {
-        return juce::File{GetJsonFilePath()};
+        juce::File _jsonFile(GetJsonFilePath());
+        
+        //Creates JSON file if it doesn't exist
+        if(!_jsonFile.exists())
+        {
+            jassert(_jsonFile.replaceWithText(R"({"paths":[],"favorites":[]})"));
+        }
+        
+        return _jsonFile;
     }
 
     void ReadMetadata(const juce::File& _file,

@@ -59,7 +59,7 @@ juce::Array<juce::var>* Utils::GetJsonPropertyArray(juce::var& _propertyVar,
 
 juce::Array<juce::File> Utils::LoadSongListFromJson()
 {
-    const juce::File _jsonFile(GetJsonFilePath());
+    const juce::File _jsonFile = GetJSONFile();
     const juce::String _jsonString = _jsonFile.loadFileAsString();
 
     juce::Array<juce::File> _files;
