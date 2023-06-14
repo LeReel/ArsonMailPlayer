@@ -128,6 +128,7 @@ void SceneComponent::openButtonClicked()
         // Retrieve paths as var (to write) and Array (to check if already stored)
         juce::var _paths = _parsedJson.getProperty("paths", 0);
         const juce::Array<juce::var>* _pathsArray = _paths.getArray();
+        
         // Append selected folders' path to array
         for (const juce::File& _result : _chooser.getResults())
         {
@@ -140,9 +141,9 @@ void SceneComponent::openButtonClicked()
             _paths.append(_path);
         }
 
-        const juce::String _string = juce::JSON::toString(_parsedJson);
+        const juce::String _jsonFormattedString = juce::JSON::toString(_parsedJson);
 
-        jassert(_jsonFile.replaceWithText(_string));
+        jassert(_jsonFile.replaceWithText(_jsonFormattedString));
 
         const juce::Array<juce::File> _children = _chooser.getResult().findChildFiles(2, true, "*.mp3");
         // Adds selected files to songsList

@@ -48,7 +48,7 @@ juce::Array<juce::File> Utils::LoadSongListFromJson()
     const juce::String _jsonString = _jsonFile.loadFileAsString();
 
     juce::Array<juce::File> _files;
-    
+
     juce::var _parsedJson;
     if (juce::JSON::parse(_jsonString, _parsedJson).wasOk())
     {
@@ -60,7 +60,7 @@ juce::Array<juce::File> Utils::LoadSongListFromJson()
             juce::File _folder(_folderPath);
             juce::Array<juce::File> _childFiles = _folder.findChildFiles(2, true, "*.mp3");
 
-            for(const auto& _file : _childFiles)
+            for (const auto& _file : _childFiles)
             {
                 _files.add(_file);
             }
@@ -71,7 +71,8 @@ juce::Array<juce::File> Utils::LoadSongListFromJson()
 }
 
 void Utils::ReadMetadata(const juce::File& _file, std::map<juce::String, juce::String>& _attributesMap)
-{// Reads .mp3 files metadata
+{
+    // Reads .mp3 files metadata
     if (_file.getFileExtension() == ".mp3")
     {
         std::ifstream _inputFile;
@@ -103,9 +104,9 @@ void Utils::ReadMetadata(const juce::File& _file, std::map<juce::String, juce::S
             return;
         }
 
-        Utils::SetMetadataAttribute(_inputFile, _attributesMap, "Title");
-        Utils::SetMetadataAttribute(_inputFile, _attributesMap, "Artist");
-        Utils::SetMetadataAttribute(_inputFile, _attributesMap, "Album");
+        SetMetadataAttribute(_inputFile, _attributesMap, "Title");
+        SetMetadataAttribute(_inputFile, _attributesMap, "Artist");
+        SetMetadataAttribute(_inputFile, _attributesMap, "Album");
 
         _inputFile.close();
     }
