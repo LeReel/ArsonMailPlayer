@@ -7,36 +7,14 @@ SceneComponent::SceneComponent()
     songsList.SetOwner(this);
     // Adds selected files to songsList
     songsList.InitTableList(Utils::LoadSongListFromJson());
-
-    juce::var _favorites;
-    // Retrieve favorites as var (to write in JSON) and Array (to check if already stored)
-    juce::Array<juce::var>* _favoritesPathsArray = Utils::GetJsonPropertyArray(_favorites,
-                                                                               "favorites");
-
-
-    juce::Array<juce::File> _favoritesList;
-    for (int i = 0; i < _favoritesPathsArray->size(); ++i)
-    {
-        juce::String _favoritePathAsString = _favoritesPathsArray->getReference(i);
-        const int _songsSize = songsList.GetDataList().size();
-        for (int j = 0; j < _songsSize; ++j)
-        {
-            SongTableElement* _songElement = songsList.GetDataList().getReference(j);
-            if (_songElement->GetAssociatedFile().getFullPathName() == _favoritePathAsString)
-            {
-                _songElement->SetIsFavorite(true);
-                _favoritesList.add(_songElement->GetAssociatedFile());
-                break;
-            }
-        }
-    }
-
     addAndMakeVisible(&songsList);
 
     favoritesList.SetOwner(this);
-
-    favoritesList.InitTableList(_favoritesList);
-    for (auto _favorite : favoritesList.GetDataList())
+    juce::var _favorites;
+    juce::Array<juce::var>* _favoritesPathsArray = Utils::GetJsonPropertyArray(_favorites,
+                                                                               "favorites");
+    favoritesList.InitTableList(GetFavoritesArrayFromJson(_favoritesPathsArray));
+    for (SongTableElement* _favorite : favoritesList.GetDataList())
     {
         _favorite->SetIsFavorite(true);
     }
@@ -90,6 +68,28 @@ void SceneComponent::resized()
     currentPlaying.setBounds(0, _heightMinusBy4, _width, _heightBy4);
 
     openButton.setBounds(0, _heightMinusBy4, _width / 8, _height / 8);
+}
+
+juce::Array<juce::File> SceneComponent::GetFavoritesArrayFromJson(juce::Array<juce::var>* _pathsArray)
+{
+    juce::Array<juce::File> _favoritesList;
+    for (int i = 0; i < _pathsArray->size(); ++i)
+    {
+        juce::String _favoritePathAsString = _pathsArray->getReference(i);
+        const int _songsSize = songsList.GetDataList().size();
+        for (int j = 0; j < _songsSize; ++j)
+        {
+            SongTableElement* _songElement = songsList.GetDataList().getReference(j);
+            if (_songElement->GetAssociatedFile().getFullPathName() == _favoritePathAsString)
+            {
+                _songElement->SetIsFavorite(true);
+                _favoritesList.add(_songElement->GetAssociatedFile());
+                break;
+            }
+        }
+    }
+
+    return _favoritesList;
 }
 
 void SceneComponent::onSongChose(SongTableElement& _song)

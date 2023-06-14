@@ -31,6 +31,8 @@ public:
             return nullptr;
         }
     }
+    
+    juce::Array<juce::File> GetFavoritesArrayFromJson(juce::Array<juce::var>* _pathsArray);
 
     /// Event functions
     void onSongChose(SongTableElement& _song);
