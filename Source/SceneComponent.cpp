@@ -118,15 +118,14 @@ void SceneComponent::onFavoriteClicked(SongTableElement& _song)
                                                                           "favorites",
                                                                           _parsedJson);
 
-    switch (_song.GetIsFavorite())
+    if (_song.GetIsFavorite())
     {
-    case true:
         favoritesList.AddSongToList(&_song);
         _favorites.append(_song.GetAssociatedFile().getFullPathName());
-        break;
-
-    case false:
-        int _favoritesSize = favoritesList.GetDataList().size();
+    }
+    else
+    {
+        const int _favoritesSize = favoritesList.GetDataList().size();
         for (int i = 0; i < _favoritesSize; ++i)
         {
             juce::String _favorite = _favoritesArray->getReference(i);

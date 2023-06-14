@@ -85,7 +85,9 @@ juce::Array<juce::File> Utils::LoadSongListFromJson()
     return _files;
 }
 
-void Utils::ReadMetadata(const juce::File& _file, std::map<juce::String, juce::String>& _attributesMap)
+void Utils::ReadMetadata(const juce::File& _file,
+                         std::map<juce::String,
+                                  juce::String>& _attributesMap)
 {
     // Reads .mp3 files metadata
     if (_file.getFileExtension() == ".mp3")
@@ -127,7 +129,8 @@ void Utils::ReadMetadata(const juce::File& _file, std::map<juce::String, juce::S
     }
 }
 
-void Utils::SetMetadataAttribute(std::ifstream& _file, std::map<juce::String, juce::String>& _attributesMap,
+void Utils::SetMetadataAttribute(std::ifstream& _file,
+                                 std::map<juce::String, juce::String>& _attributesMap,
                                  const juce::String& _attributeKey)
 {
     // Metadata max size is 30 (+ 1 char for '\0')

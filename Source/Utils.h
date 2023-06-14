@@ -33,10 +33,11 @@ namespace Utils
 
     inline juce::File GetJSONFile()
     {
-        return juce::File(GetJsonFilePath());
+        return juce::File{GetJsonFilePath()};
     }
 
-    void ReadMetadata(const juce::File& _file, std::map<juce::String, juce::String>& _attributesMap);
+    void ReadMetadata(const juce::File& _file,
+                      std::map<juce::String, juce::String>& _attributesMap);
     void SetMetadataAttribute(std::ifstream& _file,
                               std::map<juce::String, juce::String>& _attributesMap,
                               const juce::String& _attributeKey);

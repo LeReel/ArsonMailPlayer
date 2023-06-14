@@ -180,7 +180,7 @@ void TableSongListComponent::SetCurrentSelected(const SongTableElement& _songEle
         if (dataList[i] == &_songElement)
         {
             currentPlayingRow = i;
-            break;
+            return;
         }
     }
 }
