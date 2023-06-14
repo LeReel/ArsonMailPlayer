@@ -1,5 +1,7 @@
 #include "Utils.h"
 
+#include <fstream>
+
 void Utils::InitButton(juce::Component* _parent,
                        juce::Button& _button,
                        const juce::String& _text,
@@ -66,4 +68,64 @@ juce::Array<juce::File> Utils::LoadSongListFromJson()
     }
 
     return _files;
+}
+
+void Utils::ReadMetadata(const juce::File& _file, std::map<juce::String, juce::String>& _attributesMap)
+{// Reads .mp3 files metadata
+    if (_file.getFileExtension() == ".mp3")
+    {
+        std::ifstream _inputFile;
+        _inputFile.open(_file.getFullPathName().toStdString(), std::ios::in);
+        if (!_inputFile.good())
+        {
+            return;
+        }
+        // Sets an input position indicator at the end of file to read its metadata
+        _inputFile.seekg(0, std::ios::end);
+        // Stores input position indicator
+        const int _end = _inputFile.tellg();
+        // Goes to the "TAG" tag (file's end - 128 char (4(attributes) * 30(char max for an attribute)))
+        _inputFile.seekg(_end - 128);
+
+        // Skips "TAG" tag
+        char tag[4];
+        for (int i = 0; i < 3; i++)
+        {
+            tag[i] = _inputFile.get();
+        }
+        tag[3] = '\0';
+
+        // "TAG" is missing
+        if (std::strcmp(tag, "TAG") != 0)
+        {
+            _attributesMap["Title"] = _file.getFileName().removeCharacters(".mp3");
+            _attributesMap["Artist"] = _attributesMap["Album"] = "Unknown";
+            return;
+        }
+
+        Utils::SetMetadataAttribute(_inputFile, _attributesMap, "Title");
+        Utils::SetMetadataAttribute(_inputFile, _attributesMap, "Artist");
+        Utils::SetMetadataAttribute(_inputFile, _attributesMap, "Album");
+
+        _inputFile.close();
+    }
+}
+
+void Utils::SetMetadataAttribute(std::ifstream& _file, std::map<juce::String, juce::String>& _attributesMap,
+                                 const juce::String& _attributeKey)
+{
+    // Metadata max size is 30 (+ 1 char for '\0')
+    char* _attribute = new char[31];
+
+    for (int i = 0; i < 30; i++)
+    {
+        const int _char = _file.get();
+        _attribute[i] = _char;
+    }
+    _attribute[30] = '\0';
+
+    _attributesMap[_attributeKey] = _attribute;
+
+    // Avoids leak memory caused by read-only called to fill attribute variable
+    delete[] _attribute;
 }

@@ -27,4 +27,9 @@ namespace Utils
         return juce::File::getCurrentWorkingDirectory().getFullPathName() +
             R"(\..\..\Source\songs_infos.json)";
     }
+    
+    void ReadMetadata(const juce::File& _file, std::map<juce::String, juce::String>& _attributesMap);
+    void SetMetadataAttribute(std::ifstream& _file,
+                               std::map<juce::String, juce::String>& _attributesMap,
+                               const juce::String& _attributeKey);
 }
