@@ -404,3 +404,5 @@ Builds/VisualStudio2022/MP3Player_App.vcxproj.filters
 # Juce-generated
 JuceLibraryCode/*
 Builds/*
+
+Source/songs_infos.json
