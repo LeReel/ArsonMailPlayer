@@ -20,6 +20,9 @@ namespace Utils
 
     void SetComponentOwner(IMyComponent* _owned, IMyComponent* _owner);
 
+    juce::Array<juce::var>* GetJsonPropertyArray(juce::var& _propertyVar,
+                                                 const juce::String& _property,
+                                                 juce::var& _parsedJson = juce::var());
     juce::Array<juce::File> LoadSongListFromJson();
 
     inline juce::String GetJsonFilePath()
@@ -27,9 +30,14 @@ namespace Utils
         return juce::File::getCurrentWorkingDirectory().getFullPathName() +
             R"(\..\..\Source\songs_infos.json)";
     }
-    
+
+    inline juce::File GetJSONFile()
+    {
+        return juce::File(GetJsonFilePath());
+    }
+
     void ReadMetadata(const juce::File& _file, std::map<juce::String, juce::String>& _attributesMap);
     void SetMetadataAttribute(std::ifstream& _file,
-                               std::map<juce::String, juce::String>& _attributesMap,
-                               const juce::String& _attributeKey);
+                              std::map<juce::String, juce::String>& _attributesMap,
+                              const juce::String& _attributeKey);
 }

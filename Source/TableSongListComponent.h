@@ -111,7 +111,6 @@ public:
         dataList.add(_toAdd);
         dataAmount++;
 
-
         table.updateContent();
         repaint();
         resized();
@@ -136,6 +135,8 @@ public:
         repaint();
         resized();
     }
+
+    juce::Array<SongTableElement*>& GetDataList() { return dataList; }
 #pragma endregion Customs
 #pragma endregion Methods
 

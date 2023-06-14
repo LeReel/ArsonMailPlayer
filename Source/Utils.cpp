@@ -42,6 +42,21 @@ void Utils::SetComponentOwner(IMyComponent* _owned, IMyComponent* _owner)
     _owned->SetOwner(_owner);
 }
 
+juce::Array<juce::var>* Utils::GetJsonPropertyArray(juce::var& _propertyVar,
+                                                    const juce::String& _property,
+                                                    juce::var& _parsedJson)
+{
+    // Reads JSON and convert it to String
+    const juce::String _jsonString = GetJSONFile().loadFileAsString();
+    // _parsedJson will store JSON structure
+    // Parse the JSON string
+    juce::JSON::parse(_jsonString, _parsedJson);
+
+    _propertyVar = _parsedJson.getProperty(_property, 0);
+
+    return _propertyVar.getArray();
+}
+
 juce::Array<juce::File> Utils::LoadSongListFromJson()
 {
     const juce::File _jsonFile(GetJsonFilePath());
@@ -58,9 +73,9 @@ juce::Array<juce::File> Utils::LoadSongListFromJson()
         {
             juce::String _folderPath = _parsedJson["paths"][i].toString();
             juce::File _folder(_folderPath);
-            juce::Array<juce::File> _childFiles = _folder.findChildFiles(2, true, "*.mp3");
+            juce::Array<juce::File> _children = _folder.findChildFiles(2, true, "*.mp3");
 
-            for (const auto& _file : _childFiles)
+            for (const auto& _file : _children)
             {
                 _files.add(_file);
             }
@@ -90,7 +105,7 @@ void Utils::ReadMetadata(const juce::File& _file, std::map<juce::String, juce::S
 
         // Skips "TAG" tag
         char tag[4];
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; ++i)
         {
             tag[i] = _inputFile.get();
         }
@@ -118,7 +133,7 @@ void Utils::SetMetadataAttribute(std::ifstream& _file, std::map<juce::String, ju
     // Metadata max size is 30 (+ 1 char for '\0')
     char* _attribute = new char[31];
 
-    for (int i = 0; i < 30; i++)
+    for (int i = 0; i < 30; ++i)
     {
         const int _char = _file.get();
         _attribute[i] = _char;

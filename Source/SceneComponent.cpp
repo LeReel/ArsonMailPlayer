@@ -4,17 +4,42 @@ SceneComponent::SceneComponent()
 {
     setSize(getWidth(), getHeight());
 
-    const juce::Array<juce::File> _songFiles = Utils::LoadSongListFromJson();
-
     songsList.SetOwner(this);
     // Adds selected files to songsList
-    songsList.InitTableList(_songFiles);
-    songsList.InitTableList({});
+    songsList.InitTableList(Utils::LoadSongListFromJson());
+
+    juce::var _favorites;
+    // Retrieve favorites as var (to write in JSON) and Array (to check if already stored)
+    juce::Array<juce::var>* _favoritesPathsArray = Utils::GetJsonPropertyArray(_favorites,
+                                                                               "favorites");
+
+
+    juce::Array<juce::File> _favoritesList;
+    for (int i = 0; i < _favoritesPathsArray->size(); ++i)
+    {
+        juce::String _favoritePathAsString = _favoritesPathsArray->getReference(i);
+        const int _songsSize = songsList.GetDataList().size();
+        for (int j = 0; j < _songsSize; ++j)
+        {
+            SongTableElement* _songElement = songsList.GetDataList().getReference(j);
+            if (_songElement->GetAssociatedFile().getFullPathName() == _favoritePathAsString)
+            {
+                _songElement->SetIsFavorite(true);
+                _favoritesList.add(_songElement->GetAssociatedFile());
+                break;
+            }
+        }
+    }
+
     addAndMakeVisible(&songsList);
 
     favoritesList.SetOwner(this);
-    //TODO: Init with registered favorites
-    favoritesList.InitTableList({});
+
+    favoritesList.InitTableList(_favoritesList);
+    for (auto _favorite : favoritesList.GetDataList())
+    {
+        _favorite->SetIsFavorite(true);
+    }
     addAndMakeVisible(&favoritesList);
 
     tabComponent.addTab("Song list", juce::Colours::grey, &songsList, false);
@@ -86,14 +111,36 @@ void SceneComponent::onSongChose(SongTableElement& _song)
 
 void SceneComponent::onFavoriteClicked(SongTableElement& _song)
 {
+    juce::var _parsedJson;
+    juce::var _favorites;
+    // Retrieve favorites as var (to write in JSON) and Array (to check if already stored)
+    juce::Array<juce::var>* _favoritesArray = Utils::GetJsonPropertyArray(_favorites,
+                                                                          "favorites",
+                                                                          _parsedJson);
+
     switch (_song.GetIsFavorite())
     {
     case true:
         favoritesList.AddSongToList(&_song);
+        _favorites.append(_song.GetAssociatedFile().getFullPathName());
         break;
+
     case false:
+        int _favoritesSize = favoritesList.GetDataList().size();
+        for (int i = 0; i < _favoritesSize; ++i)
+        {
+            juce::String _favorite = _favoritesArray->getReference(i);
+            if (_favorite == _song.GetAssociatedFile().getFullPathName())
+            {
+                _favorites.remove(i);
+                break;
+            }
+        }
         favoritesList.RemoveSongFromList(&_song);
     }
+
+    const juce::String _jsonFormattedString = juce::JSON::toString(_parsedJson);
+    jassert(Utils::GetJSONFile().replaceWithText(_jsonFormattedString));
 
     repaint();
     resized();
@@ -118,37 +165,29 @@ void SceneComponent::openButtonClicked()
     chooser->launchAsync(chooserFlags, [this](const juce::FileChooser& _chooser)
     {
         // Create File variable from given path
-        const juce::File _jsonFile(Utils::GetJsonFilePath());
-        // Reads JSON and convert it to String
-        const juce::String _jsonString = _jsonFile.loadFileAsString();
-        // Create a var that will store JSON structure
         juce::var _parsedJson;
-        // Parse the JSON string
-        juce::JSON::parse(_jsonString, _parsedJson);
-        // Retrieve paths as var (to write) and Array (to check if already stored)
-        juce::var _paths = _parsedJson.getProperty("paths", 0);
-        const juce::Array<juce::var>* _pathsArray = _paths.getArray();
-        
+        juce::var _paths;
+        // Retrieve favorites as var (to write in JSON) and Array (to check if already stored)
+        const juce::Array<juce::var>* _pathsArray = Utils::GetJsonPropertyArray(_paths,
+            "paths",
+            _parsedJson);
+
         // Append selected folders' path to array
         for (const juce::File& _result : _chooser.getResults())
         {
             juce::String _path = _result.getFullPathName();
             // Checks if path is already stored
-            if(_pathsArray->contains(_path))
+            if (_pathsArray->contains(_path))
             {
                 return;
             }
             _paths.append(_path);
         }
-
         const juce::String _jsonFormattedString = juce::JSON::toString(_parsedJson);
+        jassert(Utils::GetJSONFile().replaceWithText(_jsonFormattedString));
 
-        jassert(_jsonFile.replaceWithText(_jsonFormattedString));
-
+        // Adds new selected folder's children files to songsList
         const juce::Array<juce::File> _children = _chooser.getResult().findChildFiles(2, true, "*.mp3");
-        // Adds selected files to songsList
         songsList.InitTableList(_children);
-
-        favoritesList.InitTableList({/*favoriteElements*/});
     });
 }

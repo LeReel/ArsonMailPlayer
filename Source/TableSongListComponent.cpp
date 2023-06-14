@@ -146,7 +146,7 @@ void TableSongListComponent::InitTableList(const juce::Array<juce::File>& _files
     {
         addAndMakeVisible(table);
 
-        for (int i = 0, _columnId = 1; i < columnsList.size(); i++, _columnId++)
+        for (int i = 0, _columnId = 1; i < columnsList.size(); ++i, _columnId++)
         {
             const juce::String _columnString = columnsList[i];
             table.getHeader().addColumn(_columnString,
