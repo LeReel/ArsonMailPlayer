@@ -117,26 +117,30 @@ void SceneComponent::openButtonClicked()
 
     chooser->launchAsync(chooserFlags, [this](const juce::FileChooser& _chooser)
     {
-        //TODO: Store this method in Utils ?
         // Create File variable from given path
-        juce::File _jsonFile(Utils::GetJsonFilePath());
+        const juce::File _jsonFile(Utils::GetJsonFilePath());
         // Reads JSON and convert it to String
-        juce::String _jsonString = _jsonFile.loadFileAsString();
+        const juce::String _jsonString = _jsonFile.loadFileAsString();
         // Create a var that will store JSON structure
         juce::var _parsedJson;
         // Parse the JSON string
         juce::JSON::parse(_jsonString, _parsedJson);
-        // Retrieve paths array as var
+        // Retrieve paths as var (to write) and Array (to check if already stored)
         juce::var _paths = _parsedJson.getProperty("paths", 0);
+        const juce::Array<juce::var>* _pathsArray = _paths.getArray();
         // Append selected folders' path to array
-        for (auto _result : _chooser.getResults())
+        for (const juce::File& _result : _chooser.getResults())
         {
             juce::String _path = _result.getFullPathName();
-            //TODO: Check if path is already stored
+            // Checks if path is already stored
+            if(_pathsArray->contains(_path))
+            {
+                return;
+            }
             _paths.append(_path);
         }
 
-        juce::String _string = juce::JSON::toString(_parsedJson);
+        const juce::String _string = juce::JSON::toString(_parsedJson);
 
         jassert(_jsonFile.replaceWithText(_string));
 
