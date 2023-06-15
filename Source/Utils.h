@@ -28,20 +28,20 @@ namespace Utils
     inline juce::String GetJsonFilePath()
     {
         return juce::File::getCurrentWorkingDirectory().getFullPathName() +
-            //R"(\..\..\Source\songs_infos.json)"; //If from IDE
+            //R"(\..\..\Source\songs_infos.json)"; //If from IDE / Debug
             R"(\..\..\..\..\..\Source\songs_infos.json)"; //If from .exe
     }
 
     inline juce::File GetJSONFile()
     {
         juce::File _jsonFile(GetJsonFilePath());
-        
+
         //Creates JSON file if it doesn't exist
-        if(!_jsonFile.exists())
+        if (!_jsonFile.exists())
         {
             jassert(_jsonFile.replaceWithText(R"({"paths":[],"favorites":[]})"));
         }
-        
+
         return _jsonFile;
     }
 
