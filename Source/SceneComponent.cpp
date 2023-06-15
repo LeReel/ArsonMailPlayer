@@ -5,12 +5,14 @@ SceneComponent::SceneComponent()
     setSize(getWidth(), getHeight());
 
     songsList.SetOwner(this);
-    // Adds selected files to songsList
+    // Init songsList from songs_infos.json
     songsList.InitTableList(Utils::LoadSongListFromJson());
     addAndMakeVisible(&songsList);
 
     favoritesList.SetOwner(this);
+    // Creates a var object that will holds JSON's favorites
     juce::var _favorites;
+    // Writes JSON "favorites" values into var and stores it as an Array
     juce::Array<juce::var>* _favoritesPathsArray = Utils::GetJsonPropertyArray(_favorites,
                                                                                "favorites");
     favoritesList.InitTableList(GetFavoritesArrayFromJson(_favoritesPathsArray));
@@ -20,9 +22,11 @@ SceneComponent::SceneComponent()
     }
     addAndMakeVisible(&favoritesList);
 
+    // Adds lists to tabComponent
     tabComponent.addTab("Song list", juce::Colours::grey, &songsList, false);
     tabComponent.addTab("Favorites", juce::Colours::grey, &favoritesList, false);
 
+    // Subscribes to tabButtons.onClick() event
     tabComponent.getTabbedButtonBar().getTabButton(0)->addListener(this);
     tabComponent.getTabbedButtonBar().getTabButton(1)->addListener(this);
 
@@ -61,8 +65,6 @@ void SceneComponent::resized()
 
     const int _heightMinusBy4 = _height - _heightBy4;
 
-    menuBar.setBounds(0, 0, _width, _heightBy4);
-
     tabComponent.setBounds(0, 0, _width, _heightMinusBy4);
 
     currentPlaying.setBounds(0, _heightMinusBy4, _width, _heightBy4);
@@ -70,12 +72,12 @@ void SceneComponent::resized()
     openButton.setBounds(0, _heightMinusBy4, _width / 8, _height / 8);
 }
 
-juce::Array<juce::File> SceneComponent::GetFavoritesArrayFromJson(juce::Array<juce::var>* _pathsArray)
+juce::Array<juce::File> SceneComponent::GetFavoritesArrayFromJson(juce::Array<juce::var>* _jsonPathsArray)
 {
     juce::Array<juce::File> _favoritesList;
-    for (int i = 0; i < _pathsArray->size(); ++i)
+    for (int i = 0; i < _jsonPathsArray->size(); ++i)
     {
-        juce::String _favoritePathAsString = _pathsArray->getReference(i);
+        juce::String _favoritePathAsString = _jsonPathsArray->getReference(i);
         const int _songsSize = songsList.GetDataList().size();
         for (int j = 0; j < _songsSize; ++j)
         {

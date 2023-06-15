@@ -3,9 +3,8 @@
 #include "CurrentPlayingComponent.h"
 
 class SceneComponent : public juce::Component,
-                       public::juce::TabBarButton::Listener,
+                       public juce::TabBarButton::Listener,
                        public IMyComponent
-    //? Class can inherit typeWanted Listener
 {
 public:
     SceneComponent();
@@ -18,7 +17,6 @@ public:
     {
         return &songsList;
     }
-
     TableSongListComponent* GetActiveList()
     {
         switch (tabComponent.getCurrentTabIndex())
@@ -31,30 +29,32 @@ public:
             return nullptr;
         }
     }
-    
-    juce::Array<juce::File> GetFavoritesArrayFromJson(juce::Array<juce::var>* _pathsArray);
+    // Returns an Array containing associated files of each favorite song of JSON file
+    juce::Array<juce::File> GetFavoritesArrayFromJson(juce::Array<juce::var>* _jsonPathsArray);
 
     /// Event functions
+    // Called when prevButton/nextButton is clicked or when a cell is double_clicked
     void onSongChose(SongTableElement& _song);
+    // Called when a cell from favoriteColumn is clicked
     void onFavoriteClicked(SongTableElement& _song);
+    // Override that lets this class listens to TabBarButton
     void buttonClicked(juce::Button* _button) override;
-
+    // Opens a file chooser, appends selected paths to JSON and then init songsList
     void openButtonClicked();
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SceneComponent)
-
-    int currentTab = 1;
-
+    
     juce::TabbedComponent tabComponent{juce::TabbedButtonBar::TabsAtLeft};
-
-    juce::MenuBarComponent menuBar;
 
     TableSongListComponent songsList;
     TableSongListComponent favoritesList;
-
+    // Component that will holds current song's time infos, metadata and transport buttons
     CurrentPlayingComponent currentPlaying;
 
     juce::TextButton openButton;
     std::unique_ptr<juce::FileChooser> chooser;
+
+    int currentTab = 0;
+
 };

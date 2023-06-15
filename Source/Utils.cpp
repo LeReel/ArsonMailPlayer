@@ -59,22 +59,32 @@ juce::Array<juce::var>* Utils::GetJsonPropertyArray(juce::var& _propertyVar,
 
 juce::Array<juce::File> Utils::LoadSongListFromJson()
 {
+    // Retrieves JSON file
     const juce::File _jsonFile = GetJSONFile();
+    // Loads it as a String
     const juce::String _jsonString = _jsonFile.loadFileAsString();
 
+    // Array that will contains files to return
     juce::Array<juce::File> _files;
-
+    // Var that will holds JSON content
     juce::var _parsedJson;
+
+    // Parses jsonString and stores the result in parsedJson
     if (juce::JSON::parse(_jsonString, _parsedJson).wasOk())
     {
+        // Retrieves folders' paths as an Array 
         const juce::Array<juce::var>* _pathsArray = _parsedJson.getProperty("paths", 0).getArray();
-
+        
         for (int i = 0; i < _pathsArray->size(); ++i)
         {
+            // Gets the path
             juce::String _folderPath = _parsedJson["paths"][i].toString();
+            // Creates a File object (which in fact is a folder) from retrieved path
             juce::File _folder(_folderPath);
+            
+            // Retrieves folder's children and stores them in an Array
             juce::Array<juce::File> _children = _folder.findChildFiles(2, true, "*.mp3");
-
+            // Stores each file in returned Array
             for (const auto& _file : _children)
             {
                 _files.add(_file);

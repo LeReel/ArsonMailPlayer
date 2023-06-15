@@ -6,44 +6,40 @@ const juce::Array<juce::String> ATTRIBUTES_LIST{"Title", "Artist", "Album", "Fav
 
 class SongTableElement
 {
-    juce::File associatedFile;
-
-    bool isFavorite = false;
-
-    std::map<juce::String, juce::String> attributes;
 
 public:
+    // Stores associatedFile as member, reads its metadata and puts them in attribute Array
     SongTableElement(const juce::File& _associatedFile);
 
     juce::File& GetAssociatedFile() { return associatedFile; }
-
-    bool GetIsFavorite() const
-    {
-        return isFavorite;
-    }
-
-    juce::String GetStringAttribute(const juce::String& _attribute)
-    {
-        return attributes[_attribute];
-    }
-
-    void SwitchIsFavorite()
-    {
-        SetIsFavorite(!isFavorite);
-    }
-
-    void SetIsFavorite(const bool _isFavorite)
-    {
-        isFavorite = _isFavorite;
-        SetStringAttribute("Favorite", isFavorite ? "X" : "");
-    }
 
     void SetStringAttribute(const juce::String& _attribute, const juce::String& _value)
     {
         attributes[_attribute] = _value;
     }
+    void SetIsFavorite(const bool _isFavorite)
+    {
+        isFavorite = _isFavorite;
+        SetStringAttribute("Favorite", isFavorite ? "X" : "");
+    }
+    void SwitchIsFavorite()
+    {
+        SetIsFavorite(!isFavorite);
+    }
+    
+    juce::String GetStringAttribute(const juce::String& _attribute)
+    {
+        return attributes[_attribute];
+    }
+    bool GetIsFavorite() const
+    {
+        return isFavorite;
+    }
 
 private:
+    juce::File associatedFile;
+    std::map<juce::String, juce::String> attributes;
+    bool isFavorite = false;
 };
 
 class TableSongListComponent : public juce::Component,
@@ -97,13 +93,14 @@ public:
 
     SongTableElement& GetCurrentSelected() const;
 
+    // Fills dataList with given files
+    // Makes the table visible if first init
     void InitTableList(const juce::Array<juce::File>& _files);
+    //Create SongTableElement from each file if not already in dataList
     void LoadData(const juce::Array<juce::File>& _files);
+    // Updates currentPlayingRow and calls (SceneComponent)owner.onSongChose
     void ChangeCell(const int _move, const bool _isLoopAll = false, const bool _isRandom = false);
-    /**
-     * \brief Get 'Name' attribute from columnList[columnID]
-     * \return Element.Name as String
-     */
+    // Returns columnList[_columnId]
     juce::String GetColumnNameAttribute(int _columnId) const;
 
     void AddSongToList(SongTableElement* _toAdd)
@@ -115,7 +112,6 @@ public:
         repaint();
         resized();
     }
-
     void RemoveSongFromList(const SongTableElement* _toRemove)
     {
         const int _dataSize = dataList.size();
@@ -143,15 +139,18 @@ public:
 #pragma region Fields
 
 private:
+    // A table of cells
     juce::TableListBox table{{}, this};
-    juce::Font font{14.0f};
+    // Contains table's columns' attributes
+    juce::Array<juce::String> columnsList;
+    // Array of songs as SongTableElements
+    juce::Array<SongTableElement*> dataList;
 
+    juce::Font font{14.0f};
     juce::Colour rowColour;
     juce::Colour rowColour_interpolated;
-
     juce::Array<int> alreadyPlayedRandom;
-    juce::Array<juce::String> columnsList;
-    juce::Array<SongTableElement*> dataList;
+
     int dataAmount = 0, currentPlayingRow = -1, currentSelectionColumn = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TableSongListComponent)

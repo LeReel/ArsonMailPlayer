@@ -3,8 +3,8 @@
 #include "SceneComponent.h"
 
 /**
-* \brief This component lives inside our window.\n
- This is where all controls and content goes.\n
+* \brief The component living inside our window.
+ This is where everything goes.
  All other components will be children of this main component.
  */
 class MainComponent : public juce::Component
@@ -14,9 +14,15 @@ public:
 
     /**
      * \brief Callback called by the operating system when it is time
-     * to render your Component on screen
+     * to render the Component on screen
      */
     void paint(juce::Graphics&) override;
+    /**
+    * \brief Called when this component's size has been changed.
+    * Called synchronously as a result of the setBounds or setSize methods.
+    * Repeatedly changing size will repeatedly call resized()
+    * (unlike repainting, where multiple calls to repaint() are coalesced together).
+     */
     void resized() override;
 
 private:

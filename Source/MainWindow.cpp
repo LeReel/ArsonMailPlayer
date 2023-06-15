@@ -18,7 +18,6 @@ MainWindow::MainWindow(const juce::String& _name) : DocumentWindow(
     // This is the reason why the calls to functions Component::getWidth() and Component::getHeight()
     // in the MainWindow class can figure out the size of the window
     // so that the main component is displayed with the correct size
-
     centreWithSize(getWidth(),getHeight());
 
     Component::setVisible(true);

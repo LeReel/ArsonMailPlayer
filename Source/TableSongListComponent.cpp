@@ -49,7 +49,9 @@ void TableSongListComponent::cellClicked(int rowNumber, int columnId, const juce
     table.updateContent();
 }
 
-void TableSongListComponent::cellDoubleClicked(int rowNumber, int columnId, const juce::MouseEvent&)
+void TableSongListComponent::cellDoubleClicked(int rowNumber,
+                                               int columnId,
+                                               const juce::MouseEvent&)
 {
     //If favorite
     if (columnId == 4)
@@ -140,6 +142,7 @@ void TableSongListComponent::InitTableList(const juce::Array<juce::File>& _files
 {
     const bool _isFirstInit = table.getHeader().getNumColumns(false) == 0;
 
+    // Fills dataList with files
     LoadData(_files);
 
     if (_isFirstInit)
@@ -212,13 +215,14 @@ void TableSongListComponent::LoadData(const juce::Array<juce::File>& _files)
     dataAmount = dataList.size();
 }
 
-void TableSongListComponent::ChangeCell(const int _move, const bool _isLoopAll, const bool _isRandom)
+void TableSongListComponent::ChangeCell(const int _move,
+                                        const bool _isLoopAll,
+                                        const bool _isRandom)
 {
     if (dataAmount == 0 || currentPlayingRow == -1) //No LoadedDatas or no CurrentPlaying yet selected
     {
         return;
     }
-
     if (_isRandom)
     {
         const int _maxRands = dataAmount, _alreadyPlayedSize = alreadyPlayedRandom.size();
@@ -226,7 +230,6 @@ void TableSongListComponent::ChangeCell(const int _move, const bool _isLoopAll, 
         {
             alreadyPlayedRandom.clear();
         }
-
         int _rand = -1;
         bool _canExit = false;
         do

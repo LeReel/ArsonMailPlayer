@@ -23,16 +23,17 @@ public:
     CurrentPlayingComponent();
     ~CurrentPlayingComponent() override;
 
-    /**
-     * \brief Called when changes in transportSource are reported
-     */
+    // Called when changes in transportSource are reported
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
+    // Puts transportSource into 'prepared' state
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
+    // Allows the source to release anything it no longer needs after playback has stopped.
+    // This will be called when the source is no longer going to have its getNextAudioBlock() method called,
+    // Releases any spare memory, etc. that it might have allocated during the prepareToPlay() call.
     void releaseResources() override;
-    /**
-     * \brief Hands off the processing to transportSource by passing it
-     * the AudioSourceChannelInfo struct that we have been passed via the AudioAppComponent class
-     */
+    // Called repeatedly to fetch subsequent blocks of audio data.
+    // After calling the prepareToPlay() method, this callback will be made each time the audio playback hardware
+    // (or whatever other destination the audio data is going to) needs another block of data.
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
 
     void timerCallback() override;
@@ -60,7 +61,7 @@ private:
     bool isLooping = false;
     bool isLoopAll = false;
     bool isRandom = false;
-    
+
     bool isSongFinished = false;
 
     juce::TextButton playButton;
@@ -73,7 +74,7 @@ private:
 
     juce::String currentPlayingString;
     juce::String currentPlayingTimeString;
-    
+
     std::vector<juce::Button*> transportButtons;
 
     class CurrentPlayingSlider : public juce::Slider
