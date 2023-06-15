@@ -165,28 +165,34 @@ void SceneComponent::openButtonClicked()
     {
         // Create File variable from given path
         juce::var _parsedJson;
-        juce::var _paths;
+        juce::var _foldersPaths;
         // Retrieve favorites as var (to write in JSON) and Array (to check if already stored)
-        const juce::Array<juce::var>* _pathsArray = Utils::GetJsonPropertyArray(_paths,
+        const juce::Array<juce::var>* _pathsArray = Utils::GetJsonPropertyArray(_foldersPaths,
             "paths",
             _parsedJson);
+        
+        // Array that will holds folder's children files
+        juce::Array<juce::File> _childrenFiles;
 
         // Append selected folders' path to array
         for (const juce::File& _result : _chooser.getResults())
         {
-            juce::String _path = _result.getFullPathName();
+            juce::String _folderPath = _result.getFullPathName();
             // Checks if path is already stored
-            if (_pathsArray->contains(_path))
+            if (_pathsArray->contains(_folderPath))
             {
                 return;
             }
-            _paths.append(_path);
+            _foldersPaths.append(_folderPath);
+            
+            for(juce::File& _childFile : _result.findChildFiles(2, true, "*.mp3"))
+            {
+                _childrenFiles.add(_childFile);
+            }
         }
         const juce::String _jsonFormattedString = juce::JSON::toString(_parsedJson);
         jassert(Utils::GetJSONFile().replaceWithText(_jsonFormattedString));
 
-        // Adds new selected folder's children files to songsList
-        const juce::Array<juce::File> _children = _chooser.getResult().findChildFiles(2, true, "*.mp3");
-        songsList.InitTableList(_children);
+        songsList.InitTableList(_childrenFiles);
     });
 }
