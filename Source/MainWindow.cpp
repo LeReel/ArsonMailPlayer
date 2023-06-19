@@ -9,9 +9,9 @@ MainWindow::MainWindow(const juce::String& _name) : DocumentWindow(
 
     // "Owned" means that the window is now responsible for the MainComponent's lifetime
     // and will automatically destroy it as its destructor is called
-    setContentOwned(new MainComponent(), true);
 
     setResizable(true, false);
+    setSize(800, 800);
     
     // The MainComponent object's size gets set in its own constructor
     // before the MainWindow object is positioned and sized.
@@ -21,6 +21,8 @@ MainWindow::MainWindow(const juce::String& _name) : DocumentWindow(
     centreWithSize(getWidth(),getHeight());
 
     Component::setVisible(true);
+
+    setContentOwned(&sceneComponent, false);
 }
 
 void MainWindow::closeButtonPressed()

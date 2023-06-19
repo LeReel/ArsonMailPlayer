@@ -13,7 +13,6 @@
               file="Source/CurrentPlayingComponent.h"/>
         <FILE id="yOhfhu" name="SceneComponent.h" compile="0" resource="0"
               file="Source/SceneComponent.h"/>
-        <FILE id="o0bWUf" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
         <FILE id="lsfJUg" name="MainWindow.h" compile="0" resource="0" file="Source/MainWindow.h"/>
         <FILE id="W1XdPn" name="MP3Application.h" compile="0" resource="0"
               file="Source/MP3Application.h"/>
@@ -28,8 +27,6 @@
               file="Source/CurrentPlayingComponent.cpp"/>
         <FILE id="nydvA4" name="SceneComponent.cpp" compile="1" resource="0"
               file="Source/SceneComponent.cpp"/>
-        <FILE id="iNeuT0" name="MainComponent.cpp" compile="1" resource="0"
-              file="Source/MainComponent.cpp"/>
         <FILE id="Ge5zxp" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
         <FILE id="HW3cmK" name="MP3Application.cpp" compile="1" resource="0"
               file="Source/MP3Application.cpp"/>
