@@ -4,14 +4,7 @@
 
 CurrentPlayingComponent::CurrentPlayingComponent()
 {
-    setSize(getBounds().getWidth(), getBounds().getHeight());
-
-    currentPlayingString = "No selected song";
-
-    addAndMakeVisible(&currentPlayingSlider);
-    currentPlayingSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    currentPlayingSlider.SetCurrentPlayingComponent(this);
-
+    // Passing transportButtons as parameter for resized() call
     Utils::InitButton(this,
                       transportButtons,
                       prevButton,
@@ -58,15 +51,6 @@ CurrentPlayingComponent::CurrentPlayingComponent()
                       [this] { loopAllButtonClicked(); },
                       juce::Colours::yellow,
                       true);
-
-    // Registers a list of standards formats. Creates readers for wav/aiff/mp3
-    formatManager.registerBasicFormats();
-
-    // Add this as a listener to transportSource object so that
-    // we can respond to changes in its state (for example, when it stops):
-    transportSource.addChangeListener(this);
-
-    setAudioChannels(0, 2);
 }
 
 CurrentPlayingComponent::~CurrentPlayingComponent()
@@ -75,10 +59,10 @@ CurrentPlayingComponent::~CurrentPlayingComponent()
     stopTimer();
 }
 
+// Called when changes in transportSource are reported
 void CurrentPlayingComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
 {
     if (source != &transportSource) return;
-
     if (transportSource.isPlaying())
         ChangeState(Playing);
     else if ((currentState == Stopping) || (currentState == Playing))
@@ -87,18 +71,22 @@ void CurrentPlayingComponent::changeListenerCallback(juce::ChangeBroadcaster* so
         ChangeState(Paused);
 }
 
-//This method needs to be called to put transportSource into 'prepared' state
-//(before any call made to getNextAudioBlock().
+//Called by setSource() and needs to be called to put transportSource into 'prepared' state
+// (before any call made to getNextAudioBlock()
 void CurrentPlayingComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
-
+// Allows the source to release anything it no longer needs after playback has stopped.
+// This will be called when the source is no longer going to have its getNextAudioBlock() method called,
+// Releases any spare memory, etc. that it might have allocated during the prepareToPlay() call.
 void CurrentPlayingComponent::releaseResources()
 {
     transportSource.releaseResources();
 }
-
+// Called repeatedly to fetch subsequent blocks of audio data.
+// After calling the prepareToPlay() method, this callback will be made each time the audio playback hardware
+// (or whatever other destination the audio data is going to) needs another block of data.
 void CurrentPlayingComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
     if (!readerSource)
@@ -196,14 +184,18 @@ void CurrentPlayingComponent::OnSongChose(SongTableElement& _song)
         stopTimer();
     }
 
+    //Creates a reader for new selected song
     juce::AudioFormatReader* _reader = formatManager.createReaderFor(_song.GetAssociatedFile());
     if (!_reader) return;
-
+    // Creates new source for reader
     std::unique_ptr<juce::AudioFormatReaderSource> _newSource = std::make_unique<juce::AudioFormatReaderSource>(
         _reader, true);
 
+    // Sets newSource as transportSource.masterSource
     transportSource.setSource(_newSource.get(), 0, nullptr, _reader->sampleRate);
     playButton.setEnabled(true);
+    // Transfers ownership of the object originally managed by newSource to readerSource
+    // so it can be accessed via readerSource.
     readerSource = std::move(_newSource);
     readerSource->setLooping(isLooping);
 
@@ -216,6 +208,7 @@ void CurrentPlayingComponent::OnSongChose(SongTableElement& _song)
     ChangeState(Starting);
 }
 
+//Called by transportButtons and this->OnSongChose
 void CurrentPlayingComponent::ChangeState(TransportState _state)
 {
     if (_state == currentState) return;
@@ -287,7 +280,6 @@ void CurrentPlayingComponent::playButtonClicked()
     else if (currentState == Playing)
         ChangeState(Pausing);
 }
-
 void CurrentPlayingComponent::stopButtonClicked()
 {
     if (currentState == Paused)
@@ -295,21 +287,19 @@ void CurrentPlayingComponent::stopButtonClicked()
     else
         ChangeState(Stopping);
 }
-
 void CurrentPlayingComponent::prevButtonClicked() const
 {
     changeSongClicked(-1);
 }
-
 void CurrentPlayingComponent::nextButtonClicked() const
 {
     changeSongClicked(1);
 }
-
 void CurrentPlayingComponent::changeSongClicked(const int _move) const
 {
     if (const auto _sC = dynamic_cast<SceneComponent*>(componentOwner))
     {
+        // Updates TableSongList.currentSelected before calling sceneComponent.SongChose()
         _sC->GetActiveList()->ChangeCell(_move, isLoopAll, isRandom);
     }
 }

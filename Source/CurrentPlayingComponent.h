@@ -15,7 +15,7 @@ enum TransportState
 };
 
 class CurrentPlayingComponent : public juce::AudioAppComponent,
-                                public IMyComponent,
+                                public MyComponent,
                                 public juce::ChangeListener,
                                 public juce::Timer
 {
@@ -87,22 +87,19 @@ private:
             setMouseDragSensitivity(1);
             setSliderSnapsToMousePosition(true);
         }
-
         ~CurrentPlayingSlider() override
         {
             currentPlayingComponent = nullptr;
         }
-
+        
         void SetCurrentPlayingComponent(CurrentPlayingComponent* _currentPlayingComponent)
         {
             currentPlayingComponent = _currentPlayingComponent;
         }
-
         CurrentPlayingComponent& GetCurrentPlayingComponent() const
         {
             return *currentPlayingComponent;
         }
-
         void valueChanged() override
         {
             if (!currentPlayingComponent)return;

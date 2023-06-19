@@ -17,11 +17,13 @@ public:
     {
         attributes[_attribute] = _value;
     }
+    
     void SetIsFavorite(const bool _isFavorite)
     {
         isFavorite = _isFavorite;
         SetStringAttribute("Favorite", isFavorite ? "X" : "");
     }
+    
     void SwitchIsFavorite()
     {
         SetIsFavorite(!isFavorite);
@@ -31,6 +33,7 @@ public:
     {
         return attributes[_attribute];
     }
+    
     bool GetIsFavorite() const
     {
         return isFavorite;
@@ -39,12 +42,13 @@ public:
 private:
     juce::File associatedFile;
     std::map<juce::String, juce::String> attributes;
+    
     bool isFavorite = false;
 };
 
 class TableSongListComponent : public juce::Component,
-                               public IMyComponent,
-                               public juce::TableListBoxModel
+                               public juce::TableListBoxModel,
+                               public MyComponent
 {
 public:
     TableSongListComponent();

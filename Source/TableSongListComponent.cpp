@@ -5,10 +5,9 @@
 SongTableElement::SongTableElement(const juce::File& _associatedFile)
 {
     associatedFile = _associatedFile;
-
-    Utils::ReadMetadata(_associatedFile, attributes);
-
-    attributes["Favorite"] = "";
+    // Fills attributes map with associated file's metadata
+    Utils::ReadMetadata(associatedFile, attributes);
+    attributes["Favorite"] = attributes["Export"] = "";
 }
 #pragma endregion SongTableElement
 
@@ -44,9 +43,10 @@ void TableSongListComponent::cellClicked(int rowNumber, int columnId, const juce
         _sC->onFavoriteClicked(*_songElement);
     }
 
+    table.updateContent();
+
     repaint();
     resized();
-    table.updateContent();
 }
 
 void TableSongListComponent::cellDoubleClicked(int rowNumber,
@@ -60,7 +60,6 @@ void TableSongListComponent::cellDoubleClicked(int rowNumber,
     }
 
     SetCurrentSelected(rowNumber);
-
     if (SceneComponent* _sC = dynamic_cast<SceneComponent*>(componentOwner))
     {
         _sC->onSongChose(GetCurrentSelected());
@@ -101,7 +100,7 @@ void TableSongListComponent::paintCell(juce::Graphics& g,
                0,
                width - 4,
                height,
-               columnId == 4 //Favorite column
+               columnId == 4 || columnId == 5 //Favorite and Export columns
                    ? juce::Justification::centred
                    : juce::Justification::centredLeft,
                true);
@@ -140,11 +139,12 @@ SongTableElement& TableSongListComponent::GetCurrentSelected() const
 
 void TableSongListComponent::InitTableList(const juce::Array<juce::File>& _files)
 {
-    const bool _isFirstInit = table.getHeader().getNumColumns(false) == 0;
-
     // Fills dataList with files
     LoadData(_files);
 
+    const bool _isFirstInit = table.getHeader().getNumColumns(false) == 0;
+
+    // Inits headers and colors
     if (_isFirstInit)
     {
         addAndMakeVisible(table);
@@ -193,13 +193,14 @@ void TableSongListComponent::LoadData(const juce::Array<juce::File>& _files)
     for (const auto& _file : _files)
     {
         if (_file == juce::File() || !_file.exists())
+        {
             return;
-
+        }
         auto* _element = new SongTableElement(_file);
         const juce::String _title = _element->GetStringAttribute("Title");
 
         bool _alreadyInList = false;
-
+        // Checks if file is already in list
         for (SongTableElement* _data : dataList)
         {
             if (_data->GetStringAttribute("Title") == _title)
@@ -208,10 +209,8 @@ void TableSongListComponent::LoadData(const juce::Array<juce::File>& _files)
                 break;
             }
         }
-
         if (!_alreadyInList) dataList.add(_element);
     }
-
     dataAmount = dataList.size();
 }
 
@@ -241,9 +240,9 @@ void TableSongListComponent::ChangeCell(const int _move,
         while (!_canExit);
 
         alreadyPlayedRandom.add(_rand);
-
         currentPlayingRow = _rand;
     }
+    // If _move is out of range 
     else if (currentPlayingRow + _move < 0 || currentPlayingRow + _move >= dataAmount)
     {
         if (!_isLoopAll)

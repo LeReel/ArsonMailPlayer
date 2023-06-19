@@ -2,6 +2,7 @@
 
 #include <fstream>
 
+// Overload of InitButton() for calls that don't pass an array
 void Utils::InitButton(juce::Component* _parent,
                        juce::Button& _button,
                        const juce::String& _text,
@@ -18,7 +19,6 @@ void Utils::InitButton(juce::Component* _parent,
                _colour,
                _isEnabled);
 }
-
 void Utils::InitButton(juce::Component* _parent,
                        std::vector<juce::Button*>& _buttonsArray,
                        juce::Button& _button,
@@ -37,7 +37,7 @@ void Utils::InitButton(juce::Component* _parent,
     _parent->addAndMakeVisible(&_button);
 }
 
-void Utils::SetComponentOwner(IMyComponent* _owned, IMyComponent* _owner)
+void Utils::SetComponentOwner(MyComponent* _owned, MyComponent* _owner)
 {
     _owned->SetOwner(_owner);
 }
@@ -51,9 +51,8 @@ juce::Array<juce::var>* Utils::GetJsonPropertyArray(juce::var& _propertyVar,
     // _parsedJson will store JSON structure
     // Parse the JSON string
     juce::JSON::parse(_jsonString, _parsedJson);
-
     _propertyVar = _parsedJson.getProperty(_property, 0);
-
+    
     return _propertyVar.getArray();
 }
 
@@ -145,16 +144,13 @@ void Utils::SetMetadataAttribute(std::ifstream& _file,
 {
     // Metadata max size is 30 (+ 1 char for '\0')
     char* _attribute = new char[31];
-
+    // Reads each character
     for (int i = 0; i < 30; ++i)
     {
+        // Updates cursor position in file
         const int _char = _file.get();
         _attribute[i] = _char;
     }
     _attribute[30] = '\0';
-
     _attributesMap[_attributeKey] = _attribute;
-
-    // Avoids leak memory caused by read-only called to fill attribute variable
-    delete[] _attribute;
 }

@@ -1,4 +1,5 @@
 #include "SceneComponent.h"
+#include <stdio.h>
 
 SceneComponent::SceneComponent()
 {
@@ -16,29 +17,28 @@ SceneComponent::SceneComponent()
     juce::Array<juce::var>* _favoritesPathsArray = Utils::GetJsonPropertyArray(_favorites,
                                                                                "favorites");
     favoritesList.InitTableList(GetFavoritesArrayFromJson(_favoritesPathsArray));
-    for (SongTableElement* _favorite : favoritesList.GetDataList())
+    // Marks corresponding songsList elements as favorite
+    for (SongTableElement* _song : songsList.GetDataList())
     {
-        _favorite->SetIsFavorite(true);
+        _song->SetIsFavorite(true);
     }
     addAndMakeVisible(&favoritesList);
 
     // Adds lists to tabComponent
     tabComponent.addTab("Song list", juce::Colours::grey, &songsList, false);
     tabComponent.addTab("Favorites", juce::Colours::grey, &favoritesList, false);
-
     // Subscribes to tabButtons.onClick() event
     tabComponent.getTabbedButtonBar().getTabButton(0)->addListener(this);
     tabComponent.getTabbedButtonBar().getTabButton(1)->addListener(this);
-
     addAndMakeVisible(&tabComponent);
 
     currentPlaying.SetOwner(this);
     addAndMakeVisible(&currentPlaying);
 
     Utils::InitButton(this,
-                      openButton,
-                      "Open",
-                      [this] { openButtonClicked(); },
+                      importButton,
+                      "Import",
+                      [this] { importButtonClicked(); },
                       juce::Colours::darkslategrey,
                       true);
 }
@@ -61,7 +61,8 @@ void SceneComponent::resized()
 {
     const int _width = getWidth(), _height = getHeight();
 
-    const int _heightBy4 = _height / 4;
+    const int _heightBy4 = _height / 4,
+              _widthBy8 = _width / 8;
 
     const int _heightMinusBy4 = _height - _heightBy4;
 
@@ -69,7 +70,7 @@ void SceneComponent::resized()
 
     currentPlaying.setBounds(0, _heightMinusBy4, _width, _heightBy4);
 
-    openButton.setBounds(0, _heightMinusBy4, _width / 8, _height / 8);
+    importButton.setBounds(0, _heightMinusBy4, _widthBy8, _height / 8);
 }
 
 juce::Array<juce::File> SceneComponent::GetFavoritesArrayFromJson(juce::Array<juce::var>* _jsonPathsArray)
@@ -82,6 +83,7 @@ juce::Array<juce::File> SceneComponent::GetFavoritesArrayFromJson(juce::Array<ju
         for (int j = 0; j < _songsSize; ++j)
         {
             SongTableElement* _songElement = songsList.GetDataList().getReference(j);
+            // If songsList[j] is favorite
             if (_songElement->GetAssociatedFile().getFullPathName() == _favoritePathAsString)
             {
                 _songElement->SetIsFavorite(true);
@@ -90,7 +92,6 @@ juce::Array<juce::File> SceneComponent::GetFavoritesArrayFromJson(juce::Array<ju
             }
         }
     }
-
     return _favoritesList;
 }
 
@@ -120,6 +121,7 @@ void SceneComponent::onFavoriteClicked(SongTableElement& _song)
                                                                           "favorites",
                                                                           _parsedJson);
 
+    // Updates favoriteList.dataList and json var content
     if (_song.GetIsFavorite())
     {
         favoritesList.AddSongToList(&_song);
@@ -141,19 +143,18 @@ void SceneComponent::onFavoriteClicked(SongTableElement& _song)
     }
 
     const juce::String _jsonFormattedString = juce::JSON::toString(_parsedJson);
+    // Replace json file's content with new (formatted) string
     jassert(Utils::GetJSONFile().replaceWithText(_jsonFormattedString));
-
-    repaint();
-    resized();
 }
 
 void SceneComponent::buttonClicked(juce::Button* _button)
 {
+    currentTab = tabComponent.getCurrentTabIndex();
     resized();
     repaint();
 }
 
-void SceneComponent::openButtonClicked()
+void SceneComponent::importButtonClicked()
 {
     chooser = std::make_unique<juce::FileChooser>("Select folder to import",
                                                   juce::File{});
@@ -172,7 +173,7 @@ void SceneComponent::openButtonClicked()
         const juce::Array<juce::var>* _pathsArray = Utils::GetJsonPropertyArray(_foldersPaths,
             "paths",
             _parsedJson);
-        
+
         // Array that will holds folder's children files
         juce::Array<juce::File> _childrenFiles;
 
@@ -186,8 +187,8 @@ void SceneComponent::openButtonClicked()
                 return;
             }
             _foldersPaths.append(_folderPath);
-            
-            for(juce::File& _childFile : _result.findChildFiles(2, true, "*.mp3"))
+
+            for (juce::File& _childFile : _result.findChildFiles(2, true, "*.mp3"))
             {
                 _childrenFiles.add(_childFile);
             }

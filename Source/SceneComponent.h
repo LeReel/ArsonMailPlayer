@@ -4,7 +4,7 @@
 
 class SceneComponent : public juce::Component,
                        public juce::TabBarButton::Listener,
-                       public IMyComponent
+                       public MyComponent
 {
 public:
     SceneComponent();
@@ -40,7 +40,7 @@ public:
     // Override that lets this class listens to TabBarButton
     void buttonClicked(juce::Button* _button) override;
     // Opens a file chooser, appends selected paths to JSON and then init songsList
-    void openButtonClicked();
+    void importButtonClicked();
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SceneComponent)
@@ -52,7 +52,10 @@ private:
     // Component that will holds current song's time infos, metadata and transport buttons
     CurrentPlayingComponent currentPlaying;
 
-    juce::TextButton openButton;
+    juce::TextButton importButton;
+
+    std::string exportLocation;
+    
     std::unique_ptr<juce::FileChooser> chooser;
 
     int currentTab = 0;

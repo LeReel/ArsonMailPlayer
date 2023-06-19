@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IMyComponent.h"
+#include "MyComponent.h"
 
 namespace Utils
 {
@@ -18,7 +18,7 @@ namespace Utils
                     juce::Colour _colour,
                     bool _isEnabled);
 
-    void SetComponentOwner(IMyComponent* _owned, IMyComponent* _owner);
+    void SetComponentOwner(MyComponent* _owned, MyComponent* _owner);
 
     juce::Array<juce::var>* GetJsonPropertyArray(juce::var& _propertyVar,
                                                  const juce::String& _property,
