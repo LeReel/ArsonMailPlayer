@@ -1,4 +1,3 @@
-#include <utility>
 #include "CurrentPlayingComponent.h"
 #include "SceneComponent.h"
 
@@ -157,7 +156,8 @@ void CurrentPlayingComponent::resized()
     const int _widthBy4 = _width / 4,
               _widthBy8 = _width / 8,
               _heightBy3 = _height / 3,
-              _heightBy4 = _height / 4;
+              _heightBy4 = _height / 4,
+              _heightBy4Minus20 = _heightBy4 - 20;
     const int _transportButtonsX = _width - _widthBy8;
 
     const int _buttonAmnt = transportButtons.size(), _buttonWidth = _width / _buttonAmnt;
@@ -168,9 +168,9 @@ void CurrentPlayingComponent::resized()
         _button->setBounds(_widthBy4 * i, _height - _heightBy3, _buttonWidth, _heightBy4);
     }
 
-    randomButton.setBounds(_transportButtonsX, _heightBy4 - 30, _widthBy8, _heightBy4 - 20);
-    loopButton.setBounds(_transportButtonsX, _heightBy4, _widthBy8, _heightBy4 - 20);
-    loopAllButton.setBounds(_transportButtonsX, _heightBy4 + 30, _widthBy8, _heightBy4 - 20);
+    randomButton.setBounds(_transportButtonsX, _heightBy4 - 30, _widthBy8, _heightBy4Minus20);
+    loopButton.setBounds(_transportButtonsX, _heightBy4, _widthBy8, _heightBy4Minus20);
+    loopAllButton.setBounds(_transportButtonsX, _heightBy4 + 30, _widthBy8, _heightBy4Minus20);
 
     currentPlayingSlider.setBounds(_widthBy4, _heightBy4, _width / 2, _heightBy3);
 }

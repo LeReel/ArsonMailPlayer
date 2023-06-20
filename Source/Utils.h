@@ -18,8 +18,6 @@ namespace Utils
                     juce::Colour _colour,
                     bool _isEnabled);
 
-    void SetComponentOwner(MyComponent* _owned, MyComponent* _owner);
-
     juce::Array<juce::var>* GetJsonPropertyArray(juce::var& _propertyVar,
                                                  const juce::String& _property,
                                                  juce::var& _parsedJson = juce::var());

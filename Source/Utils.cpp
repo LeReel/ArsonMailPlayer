@@ -37,11 +37,6 @@ void Utils::InitButton(juce::Component* _parent,
     _parent->addAndMakeVisible(&_button);
 }
 
-void Utils::SetComponentOwner(MyComponent* _owned, MyComponent* _owner)
-{
-    _owned->SetOwner(_owner);
-}
-
 juce::Array<juce::var>* Utils::GetJsonPropertyArray(juce::var& _propertyVar,
                                                     const juce::String& _property,
                                                     juce::var& _parsedJson)
